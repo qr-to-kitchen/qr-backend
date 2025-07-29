@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './core/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { SocketModule } from './socket/socket.module';
-import { RestaurantsModule } from './restaurants/restaurants.module';
+import { RestaurantsModule } from './core/restaurants/restaurants.module';
 
 @Module({
   imports: [

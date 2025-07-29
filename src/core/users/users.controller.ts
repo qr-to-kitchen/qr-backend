@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post, Request, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { RegisterUserDto } from './register-user.dto';
-import { LoginUserDto } from './login-user.dto';
-import { JwtAuthGuard } from '../security/jwt-auth.guard';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
