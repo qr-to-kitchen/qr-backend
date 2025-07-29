@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { SocketModule } from './socket/socket.module';
 import { RestaurantsModule } from './core/restaurants/restaurants.module';
 import { BranchesModule } from './core/branches/branches.module';
+import { DishesModule } from './core/dishes/dishes.module';
+import { BranchesDishesModule } from './core/branches-dishes/branches-dishes.module';
 
 @Module({
   imports: [
@@ -26,7 +28,9 @@ import { BranchesModule } from './core/branches/branches.module';
     UsersModule,
     SocketModule,
     RestaurantsModule,
-    BranchesModule
+    BranchesModule,
+    DishesModule,
+    BranchesDishesModule
   ],
   controllers: [AppController],
   providers: [AppService],
