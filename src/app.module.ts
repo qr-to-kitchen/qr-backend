@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { SocketModule } from './socket/socket.module';
 import { RestaurantsModule } from './core/restaurants/restaurants.module';
+import { BranchesModule } from './core/branches/branches.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { RestaurantsModule } from './core/restaurants/restaurants.module';
     }),
     UsersModule,
     SocketModule,
-    RestaurantsModule
+    RestaurantsModule,
+    BranchesModule
   ],
   controllers: [AppController],
   providers: [AppService],

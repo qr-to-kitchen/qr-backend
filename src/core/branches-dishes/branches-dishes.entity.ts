@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Branch } from '../branchs/branches.entity';
+import { Branch } from '../branches/branches.entity';
 import { Dish } from '../dishes/dishes.entity';
 
 @Entity()

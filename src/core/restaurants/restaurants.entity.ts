@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../users/users.entity';
-import { Branch } from '../branchs/branches.entity';
+import { Branch } from '../branches/branches.entity';
 import { Dish } from '../dishes/dishes.entity';
 
 @Entity()
