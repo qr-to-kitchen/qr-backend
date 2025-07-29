@@ -2,6 +2,10 @@ import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { Branch } from '../branchs/branches.entity';
 
+export enum UserRole {
+  ADMIN = 'ADMIN', BRANCH = 'BRANCH'
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -16,8 +20,11 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
-  role: 'ADMIN' | 'BRANCH';
+  @Column({
+    type: 'enum',
+    enum: UserRole
+  })
+  role: UserRole;
 
   @OneToOne(() => Restaurant, (restaurant) => restaurant.user, { nullable: true })
   restaurant: Restaurant;
