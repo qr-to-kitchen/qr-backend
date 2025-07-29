@@ -6,22 +6,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Mi API con NestJS')
-    .setDescription('Documentación de la API REST')
-    .setVersion('1.0')
+    .setTitle('Qr-Backend')
     .addBearerAuth(
       {
         type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Introduce el JWT aquí',
-        in: 'header',
       },
-      'jwt-auth', // 👈 Nombre de la seguridad
+      'jwt-auth'
     )
     .build();
-
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
