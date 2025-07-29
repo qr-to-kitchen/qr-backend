@@ -9,6 +9,7 @@ import { RestaurantsModule } from './core/restaurants/restaurants.module';
 import { BranchesModule } from './core/branches/branches.module';
 import { DishesModule } from './core/dishes/dishes.module';
 import { BranchesDishesModule } from './core/branches-dishes/branches-dishes.module';
+import { OrderModule } from './core/order/order.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { BranchesDishesModule } from './core/branches-dishes/branches-dishes.mod
     RestaurantsModule,
     BranchesModule,
     DishesModule,
-    BranchesDishesModule
+    BranchesDishesModule,
+    OrderModule
   ],
   controllers: [AppController],
   providers: [AppService],
