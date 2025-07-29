@@ -1,12 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Restaurant } from '../restaurants/restaurants.entity';
+import { Branch } from '../branchs/branches.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column()
-  name: string;
 
   @Column({ unique: true })
   email: string;
@@ -16,4 +15,13 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column()
+  role: 'ADMIN' | 'BRANCH';
+
+  @OneToOne(() => Restaurant, (restaurant) => restaurant.user, { nullable: true })
+  restaurant: Restaurant;
+
+  @OneToOne(() => Branch, (branch) => branch.user, { nullable: true })
+  branch: Branch;
 }

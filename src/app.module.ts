@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { SocketModule } from './socket/socket.module';
+import { RestaurantsModule } from './restaurants/restaurants.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { SocketModule } from './socket/socket.module';
       synchronize: true,
     }),
     UsersModule,
-    SocketModule
+    SocketModule,
+    RestaurantsModule
   ],
   controllers: [AppController],
   providers: [AppService],
