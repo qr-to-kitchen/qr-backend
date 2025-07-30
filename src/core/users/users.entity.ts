@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { Branch } from '../branches/branches.entity';
 
@@ -20,15 +20,21 @@ export class User {
   @Column()
   password: string;
 
-  @Column({
-    type: 'enum',
-    enum: UserRole
-  })
+  @Column({ type: 'enum', enum: UserRole })
   role: UserRole;
 
-  @OneToOne(() => Restaurant, (restaurant) => restaurant.user, { nullable: true })
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  @OneToOne(() => Restaurant)
   restaurant: Restaurant;
 
-  @OneToOne(() => Branch, (branch) => branch.user, { nullable: true })
+  @OneToOne(() => Branch)
   branch: Branch;
 }

@@ -16,9 +16,6 @@ export class RegisterUserDto {
   password: string;
 
   @IsEnum(UserRole, { message: 'El rol debe ser ADMIN o BRANCH' })
-  @ApiProperty({
-    enum: UserRole,
-    example: UserRole.BRANCH
-  })
+  @ApiProperty({ enum: UserRole, example: UserRole.BRANCH })
   role: UserRole;
 }
