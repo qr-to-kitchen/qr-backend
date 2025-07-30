@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Order } from './order.entity';
-import { Dish } from '../dishes/dishes.entity';
+import { BranchDish } from '../branches-dishes/branches-dishes.entity';
 
 @Entity()
 export class OrderItem {
@@ -13,6 +13,6 @@ export class OrderItem {
   @ManyToOne(() => Order, order => order.items)
   order: Order;
 
-  @ManyToOne(() => Dish)
-  dish: Dish;
+  @ManyToOne(() => BranchDish)
+  branchDish: BranchDish;
 }

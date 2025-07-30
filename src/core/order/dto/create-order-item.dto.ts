@@ -9,5 +9,5 @@ export class CreateOrderItemDto {
 
   @IsNumber()
   @ApiProperty({ example: 1 })
-  dishId: number;
+  branchDishId: number;
 }
