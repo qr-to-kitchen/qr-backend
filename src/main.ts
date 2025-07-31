@@ -13,6 +13,7 @@ async function bootstrap() {
       },
       'jwt-auth'
     )
+    .addServer(process.env.NODE_ENV === 'production' ? '/qr' : '/')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
