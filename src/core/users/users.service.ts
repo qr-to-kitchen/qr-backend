@@ -6,20 +6,26 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './users.entity';
+import { User } from './entity/users.entity';
 import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { MailService } from '../../mail/mail.service';
+import { VerificationCode } from './entity/verification-code.entity';
 
 @Injectable()
 export class UsersService {
 
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>, private jwtService: JwtService
+    private userRepository: Repository<User>,
+    @InjectRepository(VerificationCode)
+    private verificationCodeRepository: Repository<VerificationCode>,
+    private jwtService: JwtService,
+    private mailService: MailService
   ) {}
 
   async register(registerUserDto: RegisterUserDto) {
@@ -154,5 +160,91 @@ export class UsersService {
         message: 'Usuario eliminado correctamente.'
       }
     }
+  }
+
+  async sendVerificationCode(email: string) {
+    const user = await this.userRepository.findOne({
+      where: { email }
+    });
+    if (!user) {
+      throw new NotFoundException({
+        message: ['Usuario no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await this.mailService.sendVerificationCodeEmail(email, code);
+
+    const verificationCode = this.verificationCodeRepository.create({
+      code: code,
+      isUsed: false,
+      user: user,
+    });
+
+    await this.verificationCodeRepository.save(verificationCode);
+
+    return {
+      message: 'Correo enviado correctamente.'
+    };
+  }
+
+  async verifyCode(email: string, code: string) {
+    const user = await this.userRepository.findOne({
+      where: { email }
+    });
+    if (!user) {
+      throw new NotFoundException({
+        message: ['Usuario no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    const verificationCode = await this.verificationCodeRepository.findOne({
+      where: {
+        user: { id: user.id },
+        code,
+        isUsed: false,
+      },
+      order: { createdAt: 'DESC' }
+    });
+    if (!verificationCode) {
+      throw new BadRequestException({
+        message: ['Código ya usado o inválido.'],
+        error: "Bad Request",
+        statusCode: 400
+      });
+    }
+
+    verificationCode.isUsed = true;
+    await this.verificationCodeRepository.save(verificationCode);
+
+    return {
+      message: 'Código validado correctamente.'
+    };
+  }
+
+  async resetPassword(email: string, password: string) {
+    const user = await this.userRepository.findOne({
+      where: { email }
+    });
+    if (!user) {
+      throw new NotFoundException({
+        message: ['Usuario no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await this.userRepository.update(user.id, { password: hashedPassword });
+
+    return {
+      message: 'Contraseña actualizada correctamente.'
+    };
   }
 }

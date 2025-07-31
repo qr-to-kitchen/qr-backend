@@ -4,7 +4,7 @@ import { BranchesService } from './branches.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Branch } from './branches.entity';
 import { Restaurant } from '../restaurants/restaurants.entity';
-import { User } from '../users/users.entity';
+import { User } from '../users/entity/users.entity';
 
 @Module({
   imports: [

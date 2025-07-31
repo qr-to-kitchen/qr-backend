@@ -3,7 +3,7 @@ import { RestaurantsController } from './restaurants.controller';
 import { RestaurantsService } from './restaurants.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Restaurant } from './restaurants.entity';
-import { User } from '../users/users.entity';
+import { User } from '../users/entity/users.entity';
 
 @Module({
   imports: [

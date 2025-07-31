@@ -1,6 +1,6 @@
 import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from '../users.entity';
+import { UserRole } from '../entity/users.entity';
 
 export class RegisterUserDto {
   @IsEmail({}, { message: 'Debe proporcionar un correo electrónico válido.' })

@@ -16,6 +16,9 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { SendCodeDto } from './dto/send-code.dto';
+import { VerifyCodeDto } from './dto/verify-code.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -60,5 +63,23 @@ export class UsersController {
   @Delete(':id')
   deleteById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.deleteById(id);
+  }
+
+  @Post('send-verification-code')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  sendVerificationCode(@Body() sendCodeDto: SendCodeDto) {
+    return this.usersService.sendVerificationCode(sendCodeDto.email);
+  }
+
+  @Post('verify-code')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  verifyCode(@Body() verifyCodeDto: VerifyCodeDto) {
+    return this.usersService.verifyCode(verifyCodeDto.email, verifyCodeDto.code);
+  }
+
+  @Post('reset-password')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.usersService.resetPassword(resetPasswordDto.email, resetPasswordDto.password);
   }
 }

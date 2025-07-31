@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '../users/users.entity';
+import { User } from '../users/entity/users.entity';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
 

@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Restaurant } from '../restaurants/restaurants.entity';
-import { Branch } from '../branches/branches.entity';
+import { Restaurant } from '../../restaurants/restaurants.entity';
+import { Branch } from '../../branches/branches.entity';
 
 export enum UserRole {
   ADMIN = 'ADMIN', BRANCH = 'BRANCH'
