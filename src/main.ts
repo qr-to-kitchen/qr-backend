@@ -5,6 +5,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  if (process.env.NODE_ENV === 'production') {
+    app.setGlobalPrefix('qr');
+  }
+
   const config = new DocumentBuilder()
     .setTitle('Qr-Backend')
     .addBearerAuth(
