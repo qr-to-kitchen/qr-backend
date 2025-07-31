@@ -19,7 +19,8 @@ async function bootstrap() {
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  const swaggerPath = process.env.NODE_ENV === 'production' ? 'qr/api' : 'api';
+  SwaggerModule.setup(swaggerPath, app, document);
 
   app.enableCors();
 
