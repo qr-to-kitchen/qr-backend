@@ -74,8 +74,17 @@ export class RestaurantsService {
     return restaurant;
   }
 
-  getAll() {
-    return this.restaurantRepository.find();
+  async getAll() {
+    const restaurants = await this.restaurantRepository.find();
+    if (!restaurants.length) {
+      throw new NotFoundException({
+        message: ['Restaurantes no encontrados.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return restaurants;
   }
 
   async updateById(id: number, updateRestaurantDto: UpdateRestaurantDto) {

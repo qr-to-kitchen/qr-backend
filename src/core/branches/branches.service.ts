@@ -19,7 +19,7 @@ export class BranchesService {
     private restaurantRepository: Repository<Restaurant>
   ) {}
 
-  async create(createBranchDto: CreateBranchDto): Promise<Branch> {
+  async create(createBranchDto: CreateBranchDto) {
     const user = await this.userRepository.findOne({
       where: { id: createBranchDto.userId }
     });
@@ -75,18 +75,18 @@ export class BranchesService {
   }
 
   async findByRestaurantId(restaurantId: number) {
-    const branch =  await this.branchRepository.find({
+    const branches =  await this.branchRepository.find({
       where: { restaurant: { id: restaurantId } }
     });
-    if (!branch) {
+    if (!branches.length) {
       throw new NotFoundException({
-        message: ['Sede no encontrada.'],
+        message: ['Sedes no encontradas.'],
         error: 'Not Found',
         statusCode: 404
       });
     }
 
-    return branch;
+    return branches;
   }
 
   async findById(id: number) {
@@ -104,8 +104,17 @@ export class BranchesService {
     return branch;
   }
 
-  getAll() {
-    return this.branchRepository.find();
+  async getAll() {
+    const branches = await this.branchRepository.find();
+    if (!branches.length) {
+      throw new NotFoundException({
+        message: ['Sedes no encontradas.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return branches;
   }
 
   async updateById(id: number, updateBranchDto: UpdateBranchDto) {

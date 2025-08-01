@@ -98,8 +98,17 @@ export class UsersService {
     return user;
   }
 
-  getAll() {
-    return this.userRepository.find();
+  async getAll() {
+    const users = await this.userRepository.find();
+    if (!users.length) {
+      throw new NotFoundException({
+        message: ['Usuarios no encontrados.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return users;
   }
 
   async updateById(id: number, updateUserDto: UpdateUserDto) {

@@ -53,33 +53,33 @@ export class BranchesDishesService {
   }
 
   async findByBranchId(branchId: number) {
-    const branchDish = await this.branchDishRepository.find({
+    const branchesDishes = await this.branchDishRepository.find({
       where: { branch: { id: branchId } }
     });
-    if (!branchDish) {
+    if (!branchesDishes.length) {
       throw new NotFoundException({
-        message: ['Plato en sede no encontrado.'],
+        message: ['Platos en sede no encontrados.'],
         error: 'Not Found',
         statusCode: 404
       });
     }
 
-    return branchDish;
+    return branchesDishes;
   }
 
   async findByDishId(dishId: number) {
-    const branchDish = await this.branchDishRepository.find({
+    const branchesDishes = await this.branchDishRepository.find({
       where: { dish: { id: dishId } }
     });
-    if (!branchDish) {
+    if (!branchesDishes) {
       throw new NotFoundException({
-        message: ['Plato en sede no encontrado.'],
+        message: ['Platos en sede no encontrados.'],
         error: 'Not Found',
         statusCode: 404
       });
     }
 
-    return branchDish;
+    return branchesDishes;
   }
 
   async findById(id: number) {

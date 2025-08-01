@@ -39,18 +39,18 @@ export class DishesService {
   }
 
   async findByRestaurantId(restaurantId: number) {
-    const dish = await this.dishRepository.find({
+    const dishes = await this.dishRepository.find({
       where: { restaurant: { id: restaurantId } }
     });
-    if (!dish) {
+    if (!dishes.length) {
       throw new NotFoundException({
-        message: ['Plato no encontrado.'],
+        message: ['Platos no encontrados.'],
         error: 'Not Found',
         statusCode: 404
       });
     }
 
-    return dish;
+    return dishes;
   }
 
   async findById(id: number) {
