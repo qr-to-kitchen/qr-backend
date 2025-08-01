@@ -6,7 +6,7 @@ export class CreateRestaurantDto {
   @ApiProperty({ example: 'string' })
   name: string;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'El ID del usuario debe ser un número.' })
   @ApiProperty({ example: 1 })
   userId: number;
 }

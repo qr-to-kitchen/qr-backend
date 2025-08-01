@@ -19,7 +19,6 @@ export class RestaurantsService {
     const user = await this.userRepository.findOne({
       where: { id: createRestaurantDto.userId }
     });
-
     if (!user) {
       throw new NotFoundException({
         message: ['Usuario no encontrado.'],
@@ -44,9 +43,53 @@ export class RestaurantsService {
     return this.restaurantRepository.save(newRestaurant);
   }
 
-  findByUserId(userId: number) {
-    return this.restaurantRepository.findOne({
+  async findByUserId(userId: number) {
+    const restaurant = await this.restaurantRepository.findOne({
       where: { user: { id: userId } }
     });
+    if (!restaurant) {
+      throw new NotFoundException({
+        message: ['Restaurante no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return restaurant;
+  }
+
+  async findById(id: number) {
+    const restaurant = await this.restaurantRepository.findOneBy({
+      id
+    });
+    if (!restaurant) {
+      throw new NotFoundException({
+        message: ['Restaurante no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return restaurant;
+  }
+
+  getAll() {
+    return this.restaurantRepository.find();
+  }
+
+  async deleteById(id: number) {
+    const result = await this.restaurantRepository.softDelete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException({
+        message: ['Restaurante no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    } else {
+      return {
+        message: 'Restaurante eliminado correctamente.'
+      }
+    }
   }
 }
