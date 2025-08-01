@@ -80,6 +80,6 @@ export class UsersController {
   @Post('reset-password')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.usersService.resetPassword(resetPasswordDto.email, resetPasswordDto.password);
+    return this.usersService.resetPassword(resetPasswordDto);
   }
 }

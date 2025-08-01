@@ -1,4 +1,4 @@
-import { IsEmail, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ResetPasswordDto {
@@ -9,4 +9,9 @@ export class ResetPasswordDto {
   @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres.' })
   @ApiProperty({ example: 'string' })
   password: string;
+
+  @IsOptional()
+  @IsBoolean({ message: 'Este campo debe ser verdadero o falso.' })
+  @ApiProperty({ example: true })
+  invalidateTokens?: boolean;
 }

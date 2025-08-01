@@ -15,6 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MailService } from '../../mail/mail.service';
 import { VerificationCode } from './entity/verification-code.entity';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -75,7 +76,10 @@ export class UsersService {
       });
     }
 
-    const payload = { sub: user.id };
+    const payload = {
+      sub: user.id,
+      tokenVersion: user.tokenVersion
+    };
     const token = this.jwtService.sign(payload);
 
     return {
@@ -236,9 +240,9 @@ export class UsersService {
     };
   }
 
-  async resetPassword(email: string, password: string) {
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const user = await this.userRepository.findOne({
-      where: { email }
+      where: { email: resetPasswordDto.email }
     });
     if (!user) {
       throw new NotFoundException({
@@ -248,9 +252,13 @@ export class UsersService {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(resetPasswordDto.password, 10);
 
-    await this.userRepository.update(user.id, { password: hashedPassword });
+    if (resetPasswordDto.invalidateTokens) {
+      user.tokenVersion = (user.tokenVersion || 0) + 1;
+    }
+
+    await this.userRepository.update(user.id, { password: hashedPassword, tokenVersion: user.tokenVersion });
 
     return {
       message: 'Contraseña actualizada correctamente.'
