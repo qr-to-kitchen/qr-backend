@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Post, Request, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller, Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Request,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { BranchesService } from './branches.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -15,12 +26,35 @@ export class BranchesController {
     return this.branchesService.create(createBranchDto);
   }
 
+  @Get('my')
   @ApiBearerAuth('jwt-auth')
   @UseGuards(JwtAuthGuard)
-  @Get('my')
   getMyBranch(@Request() req: any) {
-    const userId = req.user.id;
+    return this.branchesService.findByUserId(req.user.id);
+  }
 
-    return this.branchesService.findByUserId(userId);
+  @Get('user/:id')
+  getBranchByUserId(@Param('id', ParseIntPipe) id: number) {
+    return this.branchesService.findByUserId(id);
+  }
+
+  @Get('restaurant/:id')
+  getBranchByRestaurantId(@Param('id', ParseIntPipe) id: number) {
+    return this.branchesService.findByRestaurantId(id);
+  }
+
+  @Get(':id')
+  getBranchById(@Param('id', ParseIntPipe) id: number) {
+    return this.branchesService.findById(id);
+  }
+
+  @Get()
+  getAll() {
+    return this.branchesService.getAll();
+  }
+
+  @Delete(':id')
+  deleteById(@Param('id', ParseIntPipe) id: number) {
+    return this.branchesService.deleteById(id);
   }
 }

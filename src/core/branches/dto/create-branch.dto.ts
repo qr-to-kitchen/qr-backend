@@ -6,11 +6,11 @@ export class CreateBranchDto {
   @ApiProperty({ example: 'string' })
   address: string;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'El ID del restaurante debe ser un número.' })
   @ApiProperty({ example: 1 })
   restaurantId: number;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'El ID del usuario debe ser un número.' })
   @ApiProperty({ example: 1 })
   userId: number;
 }

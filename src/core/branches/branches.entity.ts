@@ -1,4 +1,13 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn, DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn, UpdateDateColumn,
+} from 'typeorm';
 import { User } from '../users/entity/users.entity';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
@@ -10,6 +19,15 @@ export class Branch {
 
   @Column()
   address: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @OneToOne(() => User, (user) => user.branch)
   @JoinColumn()

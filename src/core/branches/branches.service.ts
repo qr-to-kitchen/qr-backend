@@ -22,7 +22,6 @@ export class BranchesService {
     const user = await this.userRepository.findOne({
       where: { id: createBranchDto.userId }
     });
-
     if (!user) {
       throw new NotFoundException({
         message: ['Usuario no encontrado.'],
@@ -42,7 +41,6 @@ export class BranchesService {
     const restaurant = await this.restaurantRepository.findOne({
       where: { id: createBranchDto.restaurantId }
     });
-
     if (!restaurant) {
       throw new NotFoundException({
         message: ['Restaurante no encontrado.'],
@@ -60,9 +58,68 @@ export class BranchesService {
     return this.branchRepository.save(branch);
   }
 
-  findByUserId(userId: number) {
-    return this.branchRepository.findOne({
+  async findByUserId(userId: number) {
+    const branch =  await this.branchRepository.findOne({
       where: { user: { id: userId } }
     });
+    if (!branch) {
+      throw new NotFoundException({
+        message: ['Sede no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return branch;
+  }
+
+  async findByRestaurantId(restaurantId: number) {
+    const branch =  await this.branchRepository.find({
+      where: { restaurant: { id: restaurantId } }
+    });
+    if (!branch) {
+      throw new NotFoundException({
+        message: ['Sede no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return branch;
+  }
+
+  async findById(id: number) {
+    const branch = await this.branchRepository.findOneBy({
+      id
+    });
+    if (!branch) {
+      throw new NotFoundException({
+        message: ['Sede no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return branch;
+  }
+
+  getAll() {
+    return this.branchRepository.find();
+  }
+
+  async deleteById(id: number) {
+    const result = await this.branchRepository.softDelete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException({
+        message: ['Sede no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    } else {
+      return {
+        message: 'Sede eliminada correctamente.'
+      }
+    }
   }
 }
