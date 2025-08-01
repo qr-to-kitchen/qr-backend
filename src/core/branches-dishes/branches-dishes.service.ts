@@ -5,6 +5,7 @@ import { BranchDish } from './branches-dishes.entity';
 import { Repository } from 'typeorm';
 import { Dish } from '../dishes/dishes.entity';
 import { CreateBranchDishDto } from './dto/create-branch-dish.dto';
+import { UpdateBranchDishDto } from './dto/update-branch-dish.dto';
 
 @Injectable()
 export class BranchesDishesService {
@@ -94,6 +95,23 @@ export class BranchesDishesService {
     }
 
     return branchDish;
+  }
+
+  async updateById(id: number, updateBranchDishDto: UpdateBranchDishDto) {
+    const branchDish = await this.branchDishRepository.findOneBy({
+      id
+    });
+    if (!branchDish) {
+      throw new NotFoundException({
+        message: ['Plato en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    await this.branchDishRepository.update(id, updateBranchDishDto);
+
+    return this.branchDishRepository.findOneBy({ id });
   }
 
   async deleteById(id: number) {

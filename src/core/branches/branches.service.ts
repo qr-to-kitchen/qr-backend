@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User, UserRole } from '../users/entity/users.entity';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { CreateBranchDto } from './dto/create-branch.dto';
+import { UpdateBranchDto } from './dto/update-branch.dto';
 
 @Injectable()
 export class BranchesService {
@@ -105,6 +106,23 @@ export class BranchesService {
 
   getAll() {
     return this.branchRepository.find();
+  }
+
+  async updateById(id: number, updateBranchDto: UpdateBranchDto) {
+    const branch = await this.branchRepository.findOneBy({
+      id
+    });
+    if (!branch) {
+      throw new NotFoundException({
+        message: ['Sede no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    await this.branchRepository.update(id, updateBranchDto);
+
+    return this.branchRepository.findOneBy({ id });
   }
 
   async deleteById(id: number) {

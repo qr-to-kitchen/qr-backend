@@ -4,6 +4,7 @@ import { Restaurant } from './restaurants.entity';
 import { Repository } from 'typeorm';
 import { User, UserRole } from '../users/entity/users.entity';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
+import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 
 @Injectable()
 export class RestaurantsService {
@@ -75,6 +76,23 @@ export class RestaurantsService {
 
   getAll() {
     return this.restaurantRepository.find();
+  }
+
+  async updateById(id: number, updateRestaurantDto: UpdateRestaurantDto) {
+    const restaurant = await this.restaurantRepository.findOneBy({
+      id
+    });
+    if (!restaurant) {
+      throw new NotFoundException({
+        message: ['Restaurante no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    await this.restaurantRepository.update(id, updateRestaurantDto);
+
+    return this.restaurantRepository.findOneBy({ id });
   }
 
   async deleteById(id: number) {

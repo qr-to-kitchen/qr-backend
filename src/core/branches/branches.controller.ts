@@ -4,7 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Post,
+  Post, Put,
   Request,
   UseGuards,
   UsePipes,
@@ -14,6 +14,7 @@ import { BranchesService } from './branches.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
+import { UpdateBranchDto } from './dto/update-branch.dto';
 
 @Controller('branches')
 export class BranchesController {
@@ -51,6 +52,12 @@ export class BranchesController {
   @Get()
   getAll() {
     return this.branchesService.getAll();
+  }
+
+  @Put(':id')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  updateById(@Param('id', ParseIntPipe) id: number, @Body() updateBranchDto: UpdateBranchDto) {
+    return this.branchesService.updateById(id, updateBranchDto);
   }
 
   @Delete(':id')

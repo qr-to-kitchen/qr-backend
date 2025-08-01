@@ -4,6 +4,7 @@ import { Restaurant } from '../restaurants/restaurants.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateDishDto } from './dto/create-dish.dto';
+import { UpdateDishDto } from './dto/update-dish.dto';
 
 @Injectable()
 export class DishesService {
@@ -65,6 +66,23 @@ export class DishesService {
     }
 
     return dish;
+  }
+
+  async updateById(id: number, updateDishDto: UpdateDishDto) {
+    const dish = await this.dishRepository.findOneBy({
+      id
+    });
+    if (!dish) {
+      throw new NotFoundException({
+        message: ['Plato no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    await this.dishRepository.update(id, updateDishDto);
+
+    return this.dishRepository.findOneBy({ id });
   }
 
   async deleteById(id: number) {

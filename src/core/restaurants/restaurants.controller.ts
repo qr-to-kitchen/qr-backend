@@ -4,7 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Post,
+  Post, Put,
   Request,
   UseGuards,
   UsePipes,
@@ -14,6 +14,7 @@ import { RestaurantsService } from './restaurants.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
+import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 
 @Controller('restaurants')
 export class RestaurantsController {
@@ -46,6 +47,12 @@ export class RestaurantsController {
   @Get()
   getAll() {
     return this.restaurantsService.getAll();
+  }
+
+  @Put(':id')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  updateById(@Param('id', ParseIntPipe) id: number, @Body() updateRestaurantDto: UpdateRestaurantDto) {
+    return this.restaurantsService.updateById(id, updateRestaurantDto);
   }
 
   @Delete(':id')

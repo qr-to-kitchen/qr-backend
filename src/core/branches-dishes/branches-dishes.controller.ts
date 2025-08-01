@@ -1,6 +1,18 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { BranchesDishesService } from './branches-dishes.service';
 import { CreateBranchDishDto } from './dto/create-branch-dish.dto';
+import { UpdateBranchDishDto } from './dto/update-branch-dish.dto';
 
 @Controller('branches-dishes')
 export class BranchesDishesController {
@@ -26,6 +38,12 @@ export class BranchesDishesController {
   @Get(':id')
   getBranchDishById(@Param('id', ParseIntPipe) id: number) {
     return this.branchesDishesService.findById(id);
+  }
+
+  @Put(':id')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  updateById(@Param('id', ParseIntPipe) id: number, @Body() updateBranchDishDto: UpdateBranchDishDto) {
+    return this.branchesDishesService.updateById(id, updateBranchDishDto);
   }
 
   @Delete(':id')
