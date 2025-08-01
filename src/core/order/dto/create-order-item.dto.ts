@@ -7,7 +7,7 @@ export class CreateOrderItemDto {
   @ApiProperty({ example: 1 })
   quantity: number;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'El ID del plato en sede debe ser un número.' })
   @ApiProperty({ example: 1 })
   branchDishId: number;
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Order } from './entity/order.entity';
+import { Order, OrderStatus } from './entity/order.entity';
 import { Repository } from 'typeorm';
 import { OrderItem } from './entity/order-item.entity';
 import { Branch } from '../branches/branches.entity';
@@ -26,7 +26,6 @@ export class OrderService {
     const branch = await this.branchRepository.findOne({
       where: { id: createOrderDto.branchId }
     });
-
     if (!branch) {
       throw new NotFoundException({
         message: ['Sede no encontrada.'],
@@ -34,13 +33,6 @@ export class OrderService {
         statusCode: 404
       });
     }
-
-    const order = this.orderRepository.create({
-      status: createOrderDto.status,
-      branch: branch
-    });
-
-    const savedOrder = await this.orderRepository.save(order);
 
     await Promise.all(
       createOrderDto.items.map(async (itemDto) => {
@@ -55,15 +47,22 @@ export class OrderService {
           });
         }
 
-        const orderItem = this.orderItemRepository.create({
-          quantity: itemDto.quantity,
-          order: savedOrder,
-          branchDish: branchDish
-        });
-
-        return await this.orderItemRepository.save(orderItem);
+        return branchDish;
       })
     );
+
+    const order = this.orderRepository.create({
+      description: createOrderDto.description,
+      tableNumber: createOrderDto.tableNumber,
+      status: createOrderDto.status,
+      branch: branch,
+      items: createOrderDto.items.map(itemDto => ({
+        quantity: itemDto.quantity,
+        branchDish: { id: itemDto.branchDishId }
+      }))
+    });
+
+    const savedOrder = await this.orderRepository.save(order);
 
     return this.orderRepository.findOne({
       where: { id: savedOrder.id },
@@ -75,7 +74,6 @@ export class OrderService {
     const order = await this.orderRepository.findOne({
       where: { id: orderId }
     });
-
     if (!order) {
       throw new NotFoundException({
         message: [`Orden con ID ${orderId} no encontrada`],
@@ -87,7 +85,6 @@ export class OrderService {
     const branchDish = await this.branchDishRepository.findOne({
       where: { id: createOrderItemDto.branchDishId }
     });
-
     if (!branchDish) {
       throw new NotFoundException({
         message: [`Plato con ID ${createOrderItemDto.branchDishId} no encontrado`],
@@ -142,6 +139,22 @@ export class OrderService {
     return orders;
   }
 
+  async findByStatusAndBranchId(status: OrderStatus, branchId: number) {
+    const orders = await this.orderRepository.find({
+      where: { branch: { id: branchId }, status: status },
+      relations: ['branch', 'items', 'items.branchDish', 'items.branchDish.dish']
+    });
+    if (!orders.length) {
+      throw new NotFoundException({
+        message: ['Órdenes no encontradas.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return orders;
+  }
+
   async findById(id: number) {
     const order =  await this.orderRepository.findOne({
       where: { id },
@@ -156,5 +169,22 @@ export class OrderService {
     }
 
     return order;
+  }
+
+  async updateStatusById(id: number, status: OrderStatus) {
+    const order = await this.orderRepository.findOneBy({
+      id
+    });
+    if (!order) {
+      throw new NotFoundException({
+        message: ['Orden no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    await this.orderRepository.update(id, { status });
+
+    return this.orderRepository.findOneBy({ id });
   }
 }

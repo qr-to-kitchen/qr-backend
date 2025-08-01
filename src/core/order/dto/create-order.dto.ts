@@ -1,14 +1,21 @@
-import { IsArray, IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsNumber, IsOptional, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { CreateOrderItemDto } from './create-order-item.dto';
+import { OrderStatus } from '../entity/order.entity';
 
 export class CreateOrderDto {
-  @IsNotEmpty({ message: 'El estado es obligatorio.' })
-  @ApiProperty({ example: 'string' })
-  status: string;
+  @IsOptional()
+  description?: string;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'El identificador de la mesa debe ser un número.' })
+  tableNumber: number;
+
+  @IsEnum(OrderStatus, { message: 'El estado enviado es incorrecto.' })
+  @ApiProperty({ enum: OrderStatus, example: OrderStatus.CREADO })
+  status: OrderStatus;
+
+  @IsNumber({}, { message: 'El ID de la sede debe ser un número.' })
   @ApiProperty({ example: 1 })
   branchId: number;
 
@@ -17,8 +24,8 @@ export class CreateOrderDto {
   @Type(() => CreateOrderItemDto)
   @ApiProperty({
     example: [
-      { dishId: 1, quantity: 2 },
-      { dishId: 2, quantity: 1 }
+      { branchDishId: 1, quantity: 2 },
+      { branchDishId: 1, quantity: 1 }
     ]
   })
   items: CreateOrderItemDto[];
