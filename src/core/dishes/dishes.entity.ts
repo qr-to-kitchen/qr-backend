@@ -1,4 +1,12 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn, DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
 
@@ -16,7 +24,16 @@ export class Dish {
   @Column('decimal', { precision: 10, scale: 2 })
   basePrice: number;
 
-  @ManyToOne(() => Restaurant, (restaurant) => restaurant.dishes)
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  @ManyToOne(() => Restaurant)
   restaurant: Restaurant;
 
   @OneToMany(() => BranchDish, (branchDish) => branchDish.dish)

@@ -19,7 +19,6 @@ export class DishesService {
     const restaurant = await this.restaurantRepository.findOne({
       where: { id: createDishDto.restaurantId }
     });
-
     if (!restaurant) {
       throw new NotFoundException({
         message: ['Restaurante no encontrado.'],
@@ -36,5 +35,49 @@ export class DishesService {
     });
 
     return this.dishRepository.save(dish);
+  }
+
+  async findByRestaurantId(restaurantId: number) {
+    const dish = await this.dishRepository.find({
+      where: { restaurant: { id: restaurantId } }
+    });
+    if (!dish) {
+      throw new NotFoundException({
+        message: ['Plato no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return dish;
+  }
+
+  async findById(id: number) {
+    const dish = await this.dishRepository.findOneBy({
+      id
+    });
+    if (!dish) {
+      throw new NotFoundException({
+        message: ['Plato no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+  }
+
+  async deleteById(id: number) {
+    const result = await this.dishRepository.softDelete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException({
+        message: ['Plato no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    } else {
+      return {
+        message: 'Plato eliminado correctamente.'
+      }
+    }
   }
 }

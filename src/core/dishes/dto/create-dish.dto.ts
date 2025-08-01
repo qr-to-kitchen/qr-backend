@@ -15,7 +15,7 @@ export class CreateDishDto {
   @ApiProperty({ example: 10 })
   basePrice: number;
 
-  @IsNumber()
+  @IsNumber({}, { message: 'El ID del restaurante debe ser un número.' })
   @ApiProperty({ example: 1 })
   restaurantId: number;
 }
