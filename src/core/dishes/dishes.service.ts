@@ -63,6 +63,8 @@ export class DishesService {
         statusCode: 404
       });
     }
+
+    return dish;
   }
 
   async deleteById(id: number) {

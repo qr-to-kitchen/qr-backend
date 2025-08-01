@@ -22,7 +22,6 @@ export class BranchesDishesService {
     const branch = await this.branchRepository.findOne({
       where: { id: createBranchDishDto.branchId }
     });
-
     if (!branch) {
       throw new NotFoundException({
         message: ['Sede no encontrada.'],
@@ -34,7 +33,6 @@ export class BranchesDishesService {
     const dish = await this.dishRepository.findOne({
       where: { id: createBranchDishDto.dishId }
     });
-
     if (!dish) {
       throw new NotFoundException({
         message: ['Plato no encontrado.'],
@@ -51,5 +49,66 @@ export class BranchesDishesService {
     });
 
     return this.branchDishRepository.save(branchDish);
+  }
+
+  async findByBranchId(branchId: number) {
+    const branchDish = await this.branchDishRepository.find({
+      where: { branch: { id: branchId } }
+    });
+    if (!branchDish) {
+      throw new NotFoundException({
+        message: ['Plato en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return branchDish;
+  }
+
+  async findByDishId(dishId: number) {
+    const branchDish = await this.branchDishRepository.find({
+      where: { dish: { id: dishId } }
+    });
+    if (!branchDish) {
+      throw new NotFoundException({
+        message: ['Plato en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return branchDish;
+  }
+
+  async findById(id: number) {
+    const branchDish = await this.branchDishRepository.findOneBy({
+      id
+    });
+    if (!branchDish) {
+      throw new NotFoundException({
+        message: ['Plato en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return branchDish;
+  }
+
+  async deleteById(id: number) {
+    const result = await this.branchDishRepository.softDelete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException({
+        message: ['Plato en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    } else {
+      return {
+        message: 'Plato en sede eliminado correctamente.'
+      }
+    }
   }
 }

@@ -7,7 +7,7 @@ export class BranchDish {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: true })
+  @Column('decimal', { precision: 10, scale: 2 })
   customPrice: number;
 
   @Column()
