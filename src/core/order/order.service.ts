@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Order } from './order.entity';
+import { Order } from './entity/order.entity';
 import { Repository } from 'typeorm';
-import { OrderItem } from './order-item.entity';
+import { OrderItem } from './entity/order-item.entity';
 import { Branch } from '../branches/branches.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
@@ -110,10 +110,51 @@ export class OrderService {
     });
   }
 
-  getOrderById(id: number) {
-    return this.orderRepository.findOne({
+  async findByBranchId(branchId: number) {
+    const order = await this.orderRepository.find({
+      where: { branch: { id: branchId } },
+      relations: ['items', 'items.branchDish', 'items.branchDish.dish']
+    });
+    if (!order) {
+      throw new NotFoundException({
+        message: ['Órdenes no encontradas.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return order;
+  }
+
+  async findByRestaurantId(restaurantId: number) {
+    const order = await this.orderRepository.find({
+      where: { branch: { restaurant: { id: restaurantId } } },
+      relations: ['branch', 'items', 'items.branchDish', 'items.branchDish.dish']
+    });
+    if (!order) {
+      throw new NotFoundException({
+        message: ['Órdenes no encontradas.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return order;
+  }
+
+  async findById(id: number) {
+    const order =  await this.orderRepository.findOne({
       where: { id },
       relations: ['branch', 'items', 'items.branchDish', 'items.branchDish.dish']
-    })
+    });
+    if (!order) {
+      throw new NotFoundException({
+        message: ['Orden no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return order;
   }
 }

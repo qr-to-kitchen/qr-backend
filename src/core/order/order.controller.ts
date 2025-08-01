@@ -20,8 +20,18 @@ export class OrderController {
     return this.orderService.addItemToOrder(id, createOrderItemDto);
   }
 
+  @Get('branch/:id')
+  getOrderByBranchId(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.findByBranchId(id);
+  }
+
+  @Get('restaurant/:id')
+  getOrderByRestaurantId(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.findByRestaurantId(id);
+  }
+
   @Get(':id')
   getOrderById(@Param('id', ParseIntPipe) id: number) {
-    return this.orderService.getOrderById(id);
+    return this.orderService.findById(id);
   }
 }

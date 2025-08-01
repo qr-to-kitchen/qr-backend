@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Branch } from '../branches/branches.entity';
+import { Branch } from '../../branches/branches.entity';
 import { OrderItem } from './order-item.entity';
 
 @Entity()
