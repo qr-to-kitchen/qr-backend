@@ -20,7 +20,7 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @Column()
