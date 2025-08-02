@@ -11,6 +11,7 @@ import { DishesModule } from './core/dishes/dishes.module';
 import { BranchesDishesModule } from './core/branches-dishes/branches-dishes.module';
 import { OrderModule } from './core/order/order.module';
 import { ConfigurationModule } from './core/configuration/configuration.module';
+import { StatisticsModule } from './core/statistics/statistics.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { ConfigurationModule } from './core/configuration/configuration.module';
     DishesModule,
     BranchesDishesModule,
     OrderModule,
-    ConfigurationModule
+    ConfigurationModule,
+    StatisticsModule
   ],
   controllers: [AppController],
   providers: [AppService],
