@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { OrderItem } from '../order/entity/order-item.entity';
 import { MostOrderedDishDto } from './dto/most-ordered-dishes.dto';
+import { Order } from '../order/entity/order.entity';
 
 @Injectable()
 export class StatisticsService {
 
   constructor(
     @InjectRepository(OrderItem)
-    private orderItemRepository: Repository<OrderItem>
+    private orderItemRepository: Repository<OrderItem>,
+    @InjectRepository(Order)
+    private orderRepository: Repository<Order>
   ) {}
 
   async getMostOrderedDishes(branchId: number): Promise<MostOrderedDishDto[]> {
@@ -29,7 +32,11 @@ export class StatisticsService {
       .getRawMany();
 
     if (!result?.length) {
-      return [];
+      throw new NotFoundException({
+        message: ['Estadística sin datos.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
     }
 
     return result.map(item => ({
@@ -37,5 +44,23 @@ export class StatisticsService {
       dishDescription: item.dishDescription,
       totalOrdered: parseInt(item.totalOrdered)
     }));
+  }
+
+  async getOrdersByBranchAndDateRange(branchId: number, startDate: Date, endDate: Date) {
+    const orders = await this.orderRepository.find({
+      where: { branch: { id: branchId }, createdAt: Between(startDate, endDate) },
+      relations: ['branch', 'items', 'items.branchDish', 'items.branchDish.dish'],
+      order: { createdAt: 'DESC' }
+    });
+
+    if (!orders?.length) {
+      throw new NotFoundException({
+        message: ['Estadística sin datos.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return orders;
   }
 }

@@ -1,5 +1,7 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query, ValidationPipe } from '@nestjs/common';
 import { StatisticsService } from './statistics.service';
+import { OrderStatus } from '../order/entity/order.entity';
+import { ApiQuery } from '@nestjs/swagger';
 
 @Controller('statistics')
 export class StatisticsController {
@@ -9,5 +11,16 @@ export class StatisticsController {
   @Get('most-ordered-dishes-by-branch/:id')
   getMostOrderedDishes(@Param('id', ParseIntPipe) id: number) {
     return this.statisticsService.getMostOrderedDishes(id);
+  }
+
+  @Get('orders-by-branch/:id/date-range')
+  @ApiQuery({ name: 'startDate', type: Date, required: true })
+  @ApiQuery({ name: 'endDate', type: Date, required: true })
+  getOrdersByBranchAndDateRange(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('startDate', new ValidationPipe({ transform: true })) startDate: Date,
+    @Query('endDate', new ValidationPipe({ transform: true })) endDate: Date
+  ) {
+    return this.statisticsService.getOrdersByBranchAndDateRange(id, startDate, endDate);
   }
 }
