@@ -1,6 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Query, ValidationPipe } from '@nestjs/common';
 import { StatisticsService } from './statistics.service';
-import { OrderStatus } from '../order/entity/order.entity';
 import { ApiQuery } from '@nestjs/swagger';
 
 @Controller('statistics')
