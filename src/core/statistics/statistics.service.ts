@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { MostOrderedDishDto } from './dto/most-ordered-dishes.dto';
 import { Order } from '../order/entity/order.entity';
+import { GeneratedIncomeDishesDto } from './dto/generated-income-dishes.dto';
 
 @Injectable()
 export class StatisticsService {
@@ -64,5 +65,41 @@ export class StatisticsService {
     }
 
     return orders;
+  }
+
+  async getDishesIncomeByBranchAndDateRange(branchId: number, startDate: Date, endDate: Date): Promise<GeneratedIncomeDishesDto[]> {
+    const result = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items','orderItem')
+      .leftJoinAndSelect('orderItem.branchDish', 'branchDish')
+      .leftJoinAndSelect('branchDish.dish', 'dish')
+      .select([
+        'dish.id as dishId',
+        'dish.name as dishName',
+        'dish.description as dishDescription',
+        'SUM(orderItem.unitPrice * orderItem.quantity) as totalIncome'
+      ])
+      .where('branchDish.branchId = :branchId', { branchId })
+      .andWhere('order.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .groupBy('dish.id')
+      .orderBy('totalIncome', 'DESC')
+      .getRawMany();
+
+    if (!result?.length) {
+      throw new NotFoundException({
+        message: ['Estadística sin datos.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return result.map(item => ({
+      dishName: item.dishName,
+      dishDescription: item.dishDescription,
+      totalIncome: parseFloat(item.totalIncome)
+    }));
   }
 }
