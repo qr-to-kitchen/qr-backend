@@ -34,7 +34,7 @@ export class OrderController {
   }
 
   @Get('branch/:id/status')
-  @ApiQuery({ name: 'status', enum: OrderStatus, enumName: 'OrderStatus', required: true })
+  @ApiQuery({ name: 'status', enum: OrderStatus, required: true })
   getOrderByStatusAndBranchId(@Param('id', ParseIntPipe) id: number, @Query('status', new ValidationPipe({ transform: true })) status: OrderStatus) {
     return this.orderService.findByStatusAndBranchId(status, id);
   }
