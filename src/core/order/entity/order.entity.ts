@@ -38,6 +38,9 @@ export class Order {
   @DeleteDateColumn()
   deletedAt: Date;
 
+  @Column({ type: 'timestamp', nullable: true })
+  readyAt: Date;
+
   @ManyToOne(() => Branch)
   branch: Branch;
 

@@ -2,8 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { MostOrderedDishDto } from './dto/most-ordered-dishes.dto';
-import { Order } from '../order/entity/order.entity';
-import { GeneratedIncomeDishesDto } from './dto/generated-income-dishes.dto';
+import { Order, OrderStatus } from '../order/entity/order.entity';
+import { DishesIncomeDishesDto } from './dto/dishes-income-dishes.dto';
+import { AveragePreparationTimeDto } from './dto/average-preparation-time.dto';
 
 @Injectable()
 export class StatisticsService {
@@ -67,7 +68,7 @@ export class StatisticsService {
     return orders;
   }
 
-  async getDishesIncomeByBranchAndDateRange(branchId: number, startDate: Date, endDate: Date): Promise<GeneratedIncomeDishesDto[]> {
+  async getDishesIncomeByBranchAndDateRange(branchId: number, startDate: Date, endDate: Date): Promise<DishesIncomeDishesDto[]> {
     const result = await this.orderRepository
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.items','orderItem')
@@ -101,5 +102,39 @@ export class StatisticsService {
       dishDescription: item.dishDescription,
       totalIncome: parseFloat(item.totalIncome)
     }));
+  }
+
+  async getAveragePreparationTimeByBranchAndDateRange(branchId: number, startDate: Date, endDate: Date): Promise<AveragePreparationTimeDto> {
+    const result = await this.orderRepository
+      .createQueryBuilder('order')
+      .where('order.branchId = :branchId', { branchId })
+      .andWhere('order.status = :status', { status: OrderStatus.LISTO })
+      .andWhere('order.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .andWhere('order.readyAt IS NOT NULL')
+      .getMany();
+
+    if (!result?.length) {
+      throw new NotFoundException({
+        message: ['Estadística sin datos.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    const totalMinutes = result.reduce((sum, order) => {
+      const preparationTime = order.readyAt.getTime() - order.createdAt.getTime();
+      return sum + (preparationTime / (1000 * 60));
+    }, 0);
+
+    const averageTimeInMinutes = Math.round(totalMinutes / result.length);
+
+    return {
+      averageTimeInMinutes: averageTimeInMinutes,
+      averageTimeFormatted: `${Math.floor(averageTimeInMinutes / 60)}h ${averageTimeInMinutes % 60}m`,
+      totalOrders: result.length
+    };
   }
 }

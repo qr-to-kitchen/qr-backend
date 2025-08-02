@@ -199,7 +199,11 @@ export class OrderService {
       });
     }
 
-    await this.orderRepository.update(id, { status });
+    if (status.toString() === OrderStatus.LISTO) {
+      await this.orderRepository.update(id, { status: status, readyAt: new Date() });
+    } else {
+      await this.orderRepository.update(id, { status });
+    }
 
     return this.orderRepository.findOneBy({ id });
   }

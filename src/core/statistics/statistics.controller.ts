@@ -39,4 +39,15 @@ export class StatisticsController {
   ) {
     return this.statisticsService.getDishesIncomeByBranchAndDateRange(id, startDate, endDate);
   }
+
+  @Get('average-preparation-time-by-branch/:id/date-range')
+  @ApiQuery({ name: 'startDate', type: Date, required: true })
+  @ApiQuery({ name: 'endDate', type: Date, required: true })
+  getAveragePreparationTimeByBranchAndDateRange(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('startDate', new ValidationPipe({ transform: true })) startDate: Date,
+    @Query('endDate', new ValidationPipe({ transform: true })) endDate: Date
+  ) {
+    return this.statisticsService.getAveragePreparationTimeByBranchAndDateRange(id, startDate, endDate);
+  }
 }

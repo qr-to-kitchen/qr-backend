@@ -1,4 +1,4 @@
-export class GeneratedIncomeDishesDto {
+export class DishesIncomeDishesDto {
   dishName: string;
 
   dishDescription: string;
