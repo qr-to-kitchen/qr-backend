@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
-import { OrderItem } from '../order/entity/order-item.entity';
 import { MostOrderedDishDto } from './dto/most-ordered-dishes.dto';
 import { Order } from '../order/entity/order.entity';
 
@@ -9,15 +8,14 @@ import { Order } from '../order/entity/order.entity';
 export class StatisticsService {
 
   constructor(
-    @InjectRepository(OrderItem)
-    private orderItemRepository: Repository<OrderItem>,
     @InjectRepository(Order)
     private orderRepository: Repository<Order>
   ) {}
 
-  async getMostOrderedDishes(branchId: number): Promise<MostOrderedDishDto[]> {
-    const result = await this.orderItemRepository
-      .createQueryBuilder('orderItem')
+  async getMostOrderedDishesByBranchAndDateRange(branchId: number, startDate: Date, endDate: Date): Promise<MostOrderedDishDto[]> {
+    const result = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items','orderItem')
       .leftJoinAndSelect('orderItem.branchDish', 'branchDish')
       .leftJoinAndSelect('branchDish.dish', 'dish')
       .select([
@@ -27,6 +25,10 @@ export class StatisticsService {
         'SUM(orderItem.quantity) as totalOrdered'
       ])
       .where('branchDish.branchId = :branchId', { branchId })
+      .andWhere('order.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
       .groupBy('dish.id')
       .orderBy('totalOrdered', 'DESC')
       .getRawMany();
