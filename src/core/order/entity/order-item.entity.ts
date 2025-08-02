@@ -10,6 +10,9 @@ export class OrderItem {
   @Column()
   quantity: number;
 
+  @Column('decimal', { precision: 10, scale: 2 })
+  unitPrice: number;
+
   @ManyToOne(() => Order)
   order: Order;
 

@@ -34,7 +34,21 @@ export class OrderService {
       });
     }
 
-    await Promise.all(
+    for (const itemDto of createOrderDto.items) {
+      const branchDish = await this.branchDishRepository.findOne({
+        where: { id: itemDto.branchDishId },
+        relations: ['dish']
+      });
+      if (!branchDish) {
+        throw new NotFoundException({
+          message: [`Plato con ID ${itemDto.branchDishId} no encontrado`],
+          error: "Bad Request",
+          statusCode: 404
+        });
+      }
+
+      itemDto.unitPrice = branchDish.customPrice || branchDish.dish.basePrice;
+    }
       createOrderDto.items.map(async (itemDto) => {
         const branchDish = await this.branchDishRepository.findOne({
           where: { id: itemDto.branchDishId }
@@ -48,8 +62,7 @@ export class OrderService {
         }
 
         return branchDish;
-      })
-    );
+      });
 
     const order = this.orderRepository.create({
       description: createOrderDto.description,
@@ -58,6 +71,7 @@ export class OrderService {
       branch: branch,
       items: createOrderDto.items.map(itemDto => ({
         quantity: itemDto.quantity,
+        unitPrice: itemDto.unitPrice,
         branchDish: { id: itemDto.branchDishId }
       }))
     });
@@ -83,7 +97,8 @@ export class OrderService {
     }
 
     const branchDish = await this.branchDishRepository.findOne({
-      where: { id: createOrderItemDto.branchDishId }
+      where: { id: createOrderItemDto.branchDishId },
+      relations: ['dish']
     });
     if (!branchDish) {
       throw new NotFoundException({
@@ -95,6 +110,7 @@ export class OrderService {
 
     const orderItem = this.orderItemRepository.create({
       quantity: createOrderItemDto.quantity,
+      unitPrice: branchDish.customPrice || branchDish.dish.basePrice,
       order: order,
       branchDish: branchDish
     });
