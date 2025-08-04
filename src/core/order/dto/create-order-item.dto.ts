@@ -1,4 +1,4 @@
-import { IsNumber, Min } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsNumber, IsOptional, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateOrderItemDto {
@@ -10,6 +10,13 @@ export class CreateOrderItemDto {
   @IsNumber({}, { message: 'El ID del plato en sede debe ser un número.' })
   @ApiProperty({ example: 1 })
   branchDishId: number;
+
+  @IsOptional()
+  @IsArray({ message: 'Los extras deben ser una lista.' })
+  @ArrayNotEmpty({ message: 'Los extras no pueden estar vacíos.' })
+  @IsNumber({}, { each: true, message: 'Cada extra debe ser un número.' })
+  @ApiProperty({ example: [1, 2], required: false })
+  extraBranchDishIds: number[];
 
   unitPrice: number;
 }

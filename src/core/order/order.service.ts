@@ -7,6 +7,7 @@ import { Branch } from '../branches/branches.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
+import { ExtraBranchDish } from '../extras/entities/extras-branch-dish.entity';
 
 @Injectable()
 export class OrderService {
@@ -19,7 +20,9 @@ export class OrderService {
     @InjectRepository(BranchDish)
     private branchDishRepository: Repository<BranchDish>,
     @InjectRepository(Branch)
-    private branchRepository: Repository<Branch>
+    private branchRepository: Repository<Branch>,
+    @InjectRepository(ExtraBranchDish)
+    private extraBranchDishRepository: Repository<ExtraBranchDish>
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -48,21 +51,22 @@ export class OrderService {
       }
 
       itemDto.unitPrice = branchDish.customPrice || branchDish.dish.basePrice;
-    }
-      createOrderDto.items.map(async (itemDto) => {
-        const branchDish = await this.branchDishRepository.findOne({
-          where: { id: itemDto.branchDishId }
-        });
-        if (!branchDish) {
-          throw new NotFoundException({
-            message: [`Plato con ID ${itemDto.branchDishId} no encontrado`],
-            error: "Bad Request",
-            statusCode: 404
-          });
-        }
 
-        return branchDish;
-      });
+      if (itemDto.extraBranchDishIds?.length) {
+        for (const extraBranchDishId of itemDto.extraBranchDishIds) {
+          const extraBranchDish = await this.extraBranchDishRepository.findOne({
+            where: { id: extraBranchDishId }
+          });
+          if (!extraBranchDish) {
+            throw new NotFoundException({
+              message: [`Extra en Plato en Sede con ID ${extraBranchDishId} no encontrado`],
+              error: "Bad Request",
+              statusCode: 404
+            });
+          }
+        }
+      }
+    }
 
     const order = this.orderRepository.create({
       description: createOrderDto.description,
@@ -72,7 +76,10 @@ export class OrderService {
       items: createOrderDto.items.map(itemDto => ({
         quantity: itemDto.quantity,
         unitPrice: itemDto.unitPrice,
-        branchDish: { id: itemDto.branchDishId }
+        branchDish: { id: itemDto.branchDishId },
+        itemExtras: (itemDto.extraBranchDishIds ?? []).map(extraBranchDishId => ({
+          extraBranchDish: { id: extraBranchDishId }
+        }))
       }))
     });
 
@@ -80,7 +87,15 @@ export class OrderService {
 
     return this.orderRepository.findOne({
       where: { id: savedOrder.id },
-      relations: ['branch', 'items', 'items.branchDish', 'items.branchDish.dish']
+      relations: [
+        'branch',
+        'items',
+        'items.branchDish',
+        'items.branchDish.dish',
+        'items.itemExtras',
+        'items.itemExtras.extraBranchDish',
+        'items.itemExtras.extraBranchDish.extra'
+      ]
     });
   }
 

@@ -1,6 +1,7 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Order } from './order.entity';
 import { BranchDish } from '../../branches-dishes/branches-dishes.entity';
+import { OrderItemExtra } from './order-item-extra.entity';
 
 @Entity()
 export class OrderItem {
@@ -18,4 +19,7 @@ export class OrderItem {
 
   @ManyToOne(() => BranchDish)
   branchDish: BranchDish;
+
+  @OneToMany(() => OrderItemExtra, itemExtra => itemExtra.orderItem, { cascade: true })
+  itemExtras: OrderItemExtra[];
 }

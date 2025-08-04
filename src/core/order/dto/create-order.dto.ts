@@ -27,7 +27,7 @@ export class CreateOrderDto {
   @Type(() => CreateOrderItemDto)
   @ApiProperty({
     example: [
-      { branchDishId: 1, quantity: 2 },
+      { branchDishId: 1, quantity: 2, extraBranchDishIds: [1] },
       { branchDishId: 1, quantity: 1 }
     ]
   })
