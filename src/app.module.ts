@@ -13,6 +13,7 @@ import { OrderModule } from './core/order/order.module';
 import { ConfigurationModule } from './core/configuration/configuration.module';
 import { StatisticsModule } from './core/statistics/statistics.module';
 import { ExtrasModule } from './core/extras/extras.module';
+import { ImagesModule } from './core/images/images.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { ExtrasModule } from './core/extras/extras.module';
     OrderModule,
     ConfigurationModule,
     StatisticsModule,
-    ExtrasModule
+    ExtrasModule,
+    ImagesModule
   ],
   controllers: [AppController],
   providers: [AppService],
