@@ -1,0 +1,23 @@
+name: Despliegue Continuo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conexión SSH al servidor EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY  }}
+          username: ${{ secrets.LIGHTSAIL_USER  }}
+          host: ${{ secrets.LIGHTSAIL_HOST  }}
+          script: |
+            cd htdocs/qr-backend/
+            git pull
+            npm install
+            npm run build
+            pm2 restart qr-backend
