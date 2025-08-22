@@ -85,7 +85,7 @@ export class OrderService {
 
     const savedOrder = await this.orderRepository.save(order);
 
-    return this.orderRepository.findOne({
+    const orderCreated = await this.orderRepository.findOne({
       where: { id: savedOrder.id },
       relations: [
         'branch',
@@ -97,6 +97,15 @@ export class OrderService {
         'items.itemExtras.extraBranchDish.extra'
       ]
     });
+    if (!orderCreated) {
+      throw new NotFoundException({
+        message: ['Orden no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { order: orderCreated };
   }
 
   async addItemToOrder(orderId: number, createOrderItemDto: CreateOrderItemDto) {
@@ -132,10 +141,19 @@ export class OrderService {
 
     await this.orderItemRepository.save(orderItem);
 
-    return this.orderRepository.findOne({
+    const orderCreated = await this.orderRepository.findOne({
       where: { id: orderId },
       relations: ['branch', 'items', 'items.branchDish', 'items.branchDish.dish']
     });
+    if (!orderCreated) {
+      throw new NotFoundException({
+        message: ['Orden no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { order: orderCreated };
   }
 
   async findByBranchId(branchId: number) {
@@ -151,7 +169,7 @@ export class OrderService {
       });
     }
 
-    return orders;
+    return { orders };
   }
 
   async findByRestaurantId(restaurantId: number) {
@@ -167,7 +185,7 @@ export class OrderService {
       });
     }
 
-    return orders;
+    return { orders };
   }
 
   async findByStatusAndBranchId(status: OrderStatus, branchId: number) {
@@ -183,7 +201,7 @@ export class OrderService {
       });
     }
 
-    return orders;
+    return { orders };
   }
 
   async findById(id: number) {
@@ -199,7 +217,7 @@ export class OrderService {
       });
     }
 
-    return order;
+    return { order };
   }
 
   async updateStatusById(id: number, status: OrderStatus) {
@@ -220,6 +238,6 @@ export class OrderService {
       await this.orderRepository.update(id, { status });
     }
 
-    return this.orderRepository.findOneBy({ id });
+    return this.findById(id);
   }
 }

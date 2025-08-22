@@ -34,7 +34,9 @@ export class ConfigurationService {
       restaurant: restaurant
     });
 
-    return this.configurationRepository.save(newConfiguration);
+    const savedConfiguration = await this.configurationRepository.save(newConfiguration);
+
+    return { configuration: savedConfiguration };
   }
   
   async findByRestaurantId(restaurantId: number) {
@@ -49,7 +51,22 @@ export class ConfigurationService {
       });
     }
 
-    return configuration;
+    return { configuration };
+  }
+
+  async findById(id: number) {
+    const configuration = await this.configurationRepository.findOneBy({
+      id
+    });
+    if (!configuration) {
+      throw new NotFoundException({
+        message: ['Configuración no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { configuration };
   }
   
   async updateById(id: number, updateConfigurationDto: UpdateConfigurationDto) {
@@ -66,7 +83,7 @@ export class ConfigurationService {
 
     await this.configurationRepository.update(id, updateConfigurationDto);
 
-    return this.configurationRepository.findOneBy({ id });
+    return this.findById(id);
   }
   
   async deleteById(id: number) {

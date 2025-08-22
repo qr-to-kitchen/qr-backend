@@ -56,7 +56,9 @@ export class BranchesService {
       restaurant: restaurant
     });
 
-    return this.branchRepository.save(branch);
+    const savedBranch = await this.branchRepository.save(branch);
+
+    return { branch: savedBranch };
   }
 
   async findByUserId(userId: number) {
@@ -71,7 +73,7 @@ export class BranchesService {
       });
     }
 
-    return branch;
+    return { branch };
   }
 
   async findByRestaurantId(restaurantId: number) {
@@ -86,7 +88,7 @@ export class BranchesService {
       });
     }
 
-    return branches;
+    return { branches };
   }
 
   async findById(id: number) {
@@ -101,7 +103,7 @@ export class BranchesService {
       });
     }
 
-    return branch;
+    return { branch };
   }
 
   async getAll() {
@@ -114,7 +116,7 @@ export class BranchesService {
       });
     }
 
-    return branches;
+    return { branches };
   }
 
   async updateById(id: number, updateBranchDto: UpdateBranchDto) {
@@ -131,7 +133,7 @@ export class BranchesService {
 
     await this.branchRepository.update(id, updateBranchDto);
 
-    return this.branchRepository.findOneBy({ id });
+    return this.findById(id);
   }
 
   async deleteById(id: number) {

@@ -40,7 +40,9 @@ export class ExtrasService {
       branch: branch
     });
 
-    return this.extraRepository.save(extra);
+    const savedExtra = await this.extraRepository.save(extra);
+
+    return { extra: savedExtra };
   }
 
   async createExtraBranchDish(createExtraBranchDishDto: CreateExtraBranchDishDto) {
@@ -71,7 +73,24 @@ export class ExtrasService {
       branchDish: branchDish
     });
 
-    return this.extraBranchDishRepository.save(extraBranchDish);
+    const savedExtraBranchDish = await this.extraBranchDishRepository.save(extraBranchDish);
+
+    return { extraBranchDish: savedExtraBranchDish };
+  }
+
+  async findById(id: number) {
+    const extra = await this.extraRepository.findOneBy({
+      id
+    });
+    if (!extra) {
+      throw new NotFoundException({
+        message: ['Extra no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { extra };
   }
 
   async findByBranchId(branchId: number) {
@@ -86,7 +105,7 @@ export class ExtrasService {
       });
     }
 
-    return extras;
+    return { extras };
   }
 
   async findByBranchDishId(branchDishId: number) {
@@ -101,7 +120,7 @@ export class ExtrasService {
       });
     }
 
-    return extraBranchDishes;
+    return { extraBranchDishes };
   }
 
   async updateExtraById(id: number, updateExtraDto: UpdateExtraDto) {
@@ -118,7 +137,7 @@ export class ExtrasService {
 
     await this.extraRepository.update(id, updateExtraDto);
 
-    return this.extraRepository.findOneBy({ id });
+    return this.findById(id);
   }
 
   async deleteExtraById(extraId: number) {

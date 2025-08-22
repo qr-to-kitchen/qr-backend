@@ -35,7 +35,9 @@ export class DishesService {
       restaurant: restaurant
     });
 
-    return this.dishRepository.save(dish);
+    const savedDish = await this.dishRepository.save(dish);
+
+    return { dish: savedDish };
   }
 
   async findByRestaurantId(restaurantId: number) {
@@ -50,7 +52,7 @@ export class DishesService {
       });
     }
 
-    return dishes;
+    return { dishes };
   }
 
   async findById(id: number) {
@@ -65,7 +67,7 @@ export class DishesService {
       });
     }
 
-    return dish;
+    return { dish };
   }
 
   async updateById(id: number, updateDishDto: UpdateDishDto) {
@@ -82,7 +84,7 @@ export class DishesService {
 
     await this.dishRepository.update(id, updateDishDto);
 
-    return this.dishRepository.findOneBy({ id });
+    return this.findById(id);
   }
 
   async deleteById(id: number) {

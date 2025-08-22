@@ -50,7 +50,9 @@ export class UsersService {
       password: hashedPassword
     });
 
-    return this.userRepository.save(newUser);
+    const savedUser = await this.userRepository.save(newUser);
+
+    return { user: savedUser };
   }
 
   async login(loginUserDto: LoginUserDto) {
@@ -100,7 +102,7 @@ export class UsersService {
       });
     }
 
-    return user;
+    return { user };
   }
 
   async getAll() {
@@ -113,7 +115,7 @@ export class UsersService {
       });
     }
 
-    return users;
+    return { users };
   }
 
   async updateById(id: number, updateUserDto: UpdateUserDto) {
@@ -157,7 +159,7 @@ export class UsersService {
 
     await this.userRepository.update(id, updateUserDto);
 
-    return this.userRepository.findOneBy({ id });
+    return await this.findById(id);
   }
 
   async deleteById(id: number) {

@@ -49,7 +49,9 @@ export class BranchesDishesService {
       dish: dish
     });
 
-    return this.branchDishRepository.save(branchDish);
+    const savedBranchDish = await this.branchDishRepository.save(branchDish);
+
+    return { branchDish: savedBranchDish };
   }
 
   async findByBranchId(branchId: number) {
@@ -65,7 +67,7 @@ export class BranchesDishesService {
       });
     }
 
-    return branchesDishes;
+    return { branchesDishes };
   }
 
   async findByDishId(dishId: number) {
@@ -81,7 +83,7 @@ export class BranchesDishesService {
       });
     }
 
-    return branchesDishes;
+    return { branchesDishes };
   }
 
   async findById(id: number) {
@@ -97,7 +99,7 @@ export class BranchesDishesService {
       });
     }
 
-    return branchDish;
+    return { branchDish };
   }
 
   async updateById(id: number, updateBranchDishDto: UpdateBranchDishDto) {
@@ -114,7 +116,7 @@ export class BranchesDishesService {
 
     await this.branchDishRepository.update(id, updateBranchDishDto);
 
-    return this.branchDishRepository.findOneBy({ id });
+    return this.findById(id);
   }
 
   async deleteById(id: number) {
