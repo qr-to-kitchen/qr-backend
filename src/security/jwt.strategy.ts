@@ -16,9 +16,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const user = await this.userService.findById(payload.sub);
+    const userResponse = await this.userService.findById(payload.sub);
 
-    if (payload.tokenVersion !== user.tokenVersion) {
+    if (payload.tokenVersion !== userResponse.user.tokenVersion) {
       throw new UnauthorizedException('Token inválido debido a cambio de contraseña');
     }
 
