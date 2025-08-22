@@ -37,7 +37,7 @@ export class UsersController {
     return this.usersService.login(userDto);
   }
 
-  @Get('me')
+  @Get('my')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('jwt-auth')
   getProfile(@Request() req: any) {
