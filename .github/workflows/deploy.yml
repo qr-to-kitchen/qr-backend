@@ -16,6 +16,7 @@ jobs:
           username: ${{ secrets.LIGHTSAIL_USER  }}
           host: ${{ secrets.LIGHTSAIL_HOST  }}
           script: |
+            set -e
             cd htdocs/qr-backend/
             git pull
             npm install
