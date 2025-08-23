@@ -8,9 +8,8 @@ export class AppController {
 
   @Get('version')
   getVersion() {
-    const x: number = "texto";
     return {
-      version: '1.2.0'
+      version: '1.2.1'
     };
   }
 }

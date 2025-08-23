@@ -22,3 +22,19 @@ jobs:
             npm install
             npm run build
             pm2 restart qr-backend
+
+      - name: Notificación en Discord
+        if: success()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "Despliegue exitoso en *qr-backend*"
+
+      - name: Notificación en Discord (fallo)
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: 'El despliegue en *qr-backend* ha fallado'
