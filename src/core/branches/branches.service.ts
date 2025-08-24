@@ -63,7 +63,8 @@ export class BranchesService {
 
   async findByUserId(userId: number) {
     const branch =  await this.branchRepository.findOne({
-      where: { user: { id: userId } }
+      where: { user: { id: userId } },
+      relations: ['restaurant']
     });
     if (!branch) {
       throw new NotFoundException({

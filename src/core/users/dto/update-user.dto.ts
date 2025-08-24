@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsOptional } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '../entity/users.entity';
 
@@ -9,6 +9,7 @@ export class UpdateUserDto {
   email?: string;
 
   @IsOptional()
+  @IsNotEmpty({ message: 'El nombre de usuario es obligatorio.' })
   @ApiProperty({ example: 'string' })
   username?: string;
 
