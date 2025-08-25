@@ -86,10 +86,26 @@ export class BranchesDishesService {
     return { branchesDishes };
   }
 
+  async findByBranchIdAndDishId(branchId: number, dishId: number) {
+    const branchDish = await this.branchDishRepository.findOne({
+      where: { branch: { id: branchId }, dish: { id: dishId } },
+      relations: ['dish', 'branch']
+    });
+    if (!branchDish) {
+      throw new NotFoundException({
+        message: ['Plato en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { branchDish };
+  }
+
   async findById(id: number) {
     const branchDish = await this.branchDishRepository.findOne({
       where: { id },
-      relations: ['dish']
+      relations: ['dish', 'branch']
     });
     if (!branchDish) {
       throw new NotFoundException({

@@ -35,6 +35,11 @@ export class BranchesDishesController {
     return this.branchesDishesService.findByDishId(id);
   }
 
+  @Get('branch/:id/dish/:id2')
+  getBranchDishByBranchIdAndDishId(@Param('id', ParseIntPipe) id: number, @Param('id2', ParseIntPipe) id2: number) {
+    return this.branchesDishesService.findByBranchIdAndDishId(id, id2);
+  }
+
   @Get(':id')
   getBranchDishById(@Param('id', ParseIntPipe) id: number) {
     return this.branchesDishesService.findById(id);
