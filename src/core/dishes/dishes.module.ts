@@ -4,12 +4,13 @@ import { DishesService } from './dishes.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { Dish } from './dishes.entity';
+import { ImagesService } from '../images/images.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Dish, Restaurant]),
   ],
   controllers: [DishesController],
-  providers: [DishesService]
+  providers: [DishesService, ImagesService]
 })
 export class DishesModule {}

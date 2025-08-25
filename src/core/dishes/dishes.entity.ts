@@ -24,6 +24,9 @@ export class Dish {
   @Column('decimal', { precision: 10, scale: 2 })
   basePrice: number;
 
+  @Column()
+  imageUrl: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

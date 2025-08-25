@@ -6,13 +6,16 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Put,
+  Put, UploadedFile,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { DishesService } from './dishes.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
+import { ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('dishes')
 export class DishesController {
@@ -20,9 +23,11 @@ export class DishesController {
   constructor(private readonly dishesService: DishesService) {}
 
   @Post()
+  @ApiConsumes('multipart/form-data')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  create(@Body() createDishDto: CreateDishDto) {
-    return this.dishesService.create(createDishDto);
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
+  create(@UploadedFile() file: Express.Multer.File, @Body() createDishDto: CreateDishDto) {
+    return this.dishesService.create(createDishDto, file);
   }
 
   @Get('restaurant/:id')

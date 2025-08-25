@@ -22,4 +22,16 @@ export class ImagesService {
       }).end(file.buffer);
     });
   }
+
+  async uploadImageReturnUrl(file: Express.Multer.File) {
+    return new Promise((resolve: (value: string) => void, reject) => {
+      cloudinary.uploader.upload_stream((error: UploadApiErrorResponse, result: UploadApiResponse) => {
+        if (error || !result) {
+          return reject(error || new Error('Error desconocido al subir la imagen.'));
+        }
+
+        resolve(result.secure_url);
+      }).end(file.buffer);
+    });
+  }
 }

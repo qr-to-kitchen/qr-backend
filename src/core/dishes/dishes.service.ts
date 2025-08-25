@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
+import { ImagesService } from '../images/images.service';
 
 @Injectable()
 export class DishesService {
@@ -13,10 +14,11 @@ export class DishesService {
     @InjectRepository(Dish)
     private dishRepository: Repository<Dish>,
     @InjectRepository(Restaurant)
-    private restaurantRepository: Repository<Restaurant>
+    private restaurantRepository: Repository<Restaurant>,
+    private readonly imagesService: ImagesService
   ) {}
 
-  async create(createDishDto: CreateDishDto) {
+  async create(createDishDto: CreateDishDto, file: Express.Multer.File) {
     const restaurant = await this.restaurantRepository.findOne({
       where: { id: createDishDto.restaurantId }
     });
@@ -28,10 +30,13 @@ export class DishesService {
       });
     }
 
+    const imageUrl = await this.imagesService.uploadImageReturnUrl(file);
+
     const dish = this.dishRepository.create({
       name: createDishDto.name,
       description: createDishDto.description,
       basePrice: createDishDto.basePrice,
+      imageUrl: imageUrl,
       restaurant: restaurant
     });
 
@@ -42,7 +47,8 @@ export class DishesService {
 
   async findByRestaurantId(restaurantId: number) {
     const dishes = await this.dishRepository.find({
-      where: { restaurant: { id: restaurantId } }
+      where: { restaurant: { id: restaurantId } },
+      relations: ['restaurant']
     });
     if (!dishes.length) {
       throw new NotFoundException({
