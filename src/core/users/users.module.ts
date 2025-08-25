@@ -13,7 +13,7 @@ import { VerificationCode } from './entity/verification-code.entity';
     TypeOrmModule.forFeature([User, VerificationCode]),
     JwtModule.register({
       secret: 'Secret_Key_Qr_Kitchen_Back_022506',
-      signOptions: { expiresIn: '1h' }
+      signOptions: { expiresIn: '1w' }
     })
   ],
   controllers: [UsersController],

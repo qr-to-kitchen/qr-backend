@@ -1,11 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Branch } from './branches.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User, UserRole } from '../users/entity/users.entity';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
+import { CreateBranchUserDto } from './dto/create-branch-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class BranchesService {
@@ -16,7 +18,8 @@ export class BranchesService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(Restaurant)
-    private restaurantRepository: Repository<Restaurant>
+    private restaurantRepository: Repository<Restaurant>,
+    private dataSource: DataSource
   ) {}
 
   async create(createBranchDto: CreateBranchDto) {
@@ -61,6 +64,53 @@ export class BranchesService {
     return { branch: savedBranch };
   }
 
+  async createBranchWithUser(createBranchUserDto: CreateBranchUserDto) {
+    return await this.dataSource.transaction(async (manager) => {
+      const userRepo = manager.getRepository(User);
+      const branchRepo = manager.getRepository(Branch);
+      const restaurantRepo = manager.getRepository(Restaurant);
+
+      const userExisting = await userRepo.findOne({
+        where: [{ email: createBranchUserDto.user.email }, { username: createBranchUserDto.user.username }],
+      });
+      if (userExisting) {
+        throw new BadRequestException({
+          message: ['Email o username ya están en uso.'],
+          error: "Bad Request",
+          statusCode: 400
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(createBranchUserDto.user.password, 10);
+      const newUser = userRepo.create({
+        ...createBranchUserDto.user,
+        password: hashedPassword
+      });
+      const savedUser = await userRepo.save(newUser);
+
+      const restaurant = await restaurantRepo.findOne({
+        where: { id: createBranchUserDto.branch.restaurantId }
+      });
+      if (!restaurant) {
+        throw new NotFoundException({
+          message: ['Restaurante no encontrado.'],
+          error: "Bad Request",
+          statusCode: 404
+        });
+      }
+
+      const branch = branchRepo.create({
+        address: createBranchUserDto.branch.address,
+        user: savedUser,
+        restaurant: restaurant
+      });
+
+      const savedBranch = await branchRepo.save(branch);
+
+      return { branch: savedBranch }
+    });
+  }
+
   async findByUserId(userId: number) {
     const branch =  await this.branchRepository.findOne({
       where: { user: { id: userId } },
@@ -79,7 +129,8 @@ export class BranchesService {
 
   async findByRestaurantId(restaurantId: number) {
     const branches =  await this.branchRepository.find({
-      where: { restaurant: { id: restaurantId } }
+      where: { restaurant: { id: restaurantId } },
+      relations: ['restaurant']
     });
     if (!branches.length) {
       throw new NotFoundException({
@@ -93,8 +144,9 @@ export class BranchesService {
   }
 
   async findById(id: number) {
-    const branch = await this.branchRepository.findOneBy({
-      id
+    const branch = await this.branchRepository.findOne({
+      where: { id },
+      relations: ['restaurant']
     });
     if (!branch) {
       throw new NotFoundException({

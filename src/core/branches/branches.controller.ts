@@ -15,6 +15,7 @@ import { CreateBranchDto } from './dto/create-branch.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { UpdateBranchDto } from './dto/update-branch.dto';
+import { CreateBranchUserDto } from './dto/create-branch-user.dto';
 
 @Controller('branches')
 export class BranchesController {
@@ -25,6 +26,12 @@ export class BranchesController {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   create(@Body() createBranchDto: CreateBranchDto) {
     return this.branchesService.create(createBranchDto);
+  }
+
+  @Post('branch-user')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  createBranchWithUser(@Body() createUserBranchDto: CreateBranchUserDto) {
+    return this.branchesService.createBranchWithUser(createUserBranchDto);
   }
 
   @Get('my')

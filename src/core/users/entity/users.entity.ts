@@ -35,7 +35,7 @@ export class User {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToOne(() => Restaurant)
+  @OneToOne(() => Restaurant, (restaurant) => restaurant.user)
   restaurant: Restaurant;
 
   @OneToOne(() => Branch)
