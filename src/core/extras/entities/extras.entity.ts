@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Branch } from '../../branches/branches.entity';
-import { ExtraBranchDish } from './extras-branch-dish.entity';
+import { Restaurant } from '../../restaurants/restaurants.entity';
+import { ExtraBranch } from './extras-branches.entity';
 
 @Entity()
 export class Extra {
@@ -27,9 +27,9 @@ export class Extra {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToOne(() => Branch)
-  branch: Branch;
+  @ManyToOne(() => Restaurant)
+  restaurant: Restaurant;
 
-  @OneToMany(() => ExtraBranchDish, extraBranchDishes => extraBranchDishes.extra)
-  extraBranchDishes: ExtraBranchDish[];
+  @OneToMany(() => ExtraBranch, extraBranch => extraBranch.extra)
+  extraBranch: ExtraBranch[];
 }

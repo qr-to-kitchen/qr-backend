@@ -6,10 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExtraBranchDish } from './entities/extras-branch-dish.entity';
 import { Branch } from '../branches/branches.entity';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
+import { Restaurant } from '../restaurants/restaurants.entity';
+import { ExtraBranch } from './entities/extras-branches.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Extra, ExtraBranchDish, Branch, BranchDish])
+    TypeOrmModule.forFeature([Extra, ExtraBranch, ExtraBranchDish, Restaurant, Branch, BranchDish])
   ],
   controllers: [ExtrasController],
   providers: [ExtrasService]

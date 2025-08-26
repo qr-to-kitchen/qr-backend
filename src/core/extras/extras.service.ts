@@ -8,6 +8,10 @@ import { Branch } from '../branches/branches.entity';
 import { CreateExtraBranchDishDto } from './dto/create-extra-branch-dish.dto';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
 import { UpdateExtraDto } from './dto/update-extra.dto';
+import { Restaurant } from '../restaurants/restaurants.entity';
+import { ExtraBranch } from './entities/extras-branches.entity';
+import { CreateExtraBranchDto } from './dto/create-extra-branch.dto';
+import { UpdateExtraBranchDishDto } from './dto/update-extra-branch-dish.dto';
 
 @Injectable()
 export class ExtrasService {
@@ -15,8 +19,12 @@ export class ExtrasService {
   constructor(
     @InjectRepository(Extra)
     private extraRepository: Repository<Extra>,
+    @InjectRepository(ExtraBranch)
+    private extraBranchRepository: Repository<ExtraBranch>,
     @InjectRepository(ExtraBranchDish)
     private extraBranchDishRepository: Repository<ExtraBranchDish>,
+    @InjectRepository(Restaurant)
+    private restaurantRepository: Repository<Restaurant>,
     @InjectRepository(Branch)
     private branchRepository: Repository<Branch>,
     @InjectRepository(BranchDish)
@@ -24,12 +32,12 @@ export class ExtrasService {
   ) {}
 
   async createExtra(createExtraDto: CreateExtraDto) {
-    const branch = await this.branchRepository.findOne({
-      where: { id: createExtraDto.branchId }
+    const restaurant = await this.restaurantRepository.findOne({
+      where: { id: createExtraDto.restaurantId }
     });
-    if (!branch) {
+    if (!restaurant) {
       throw new NotFoundException({
-        message: ['Sede no encontrada.'],
+        message: ['Restaurante no encontrado.'],
         error: "Bad Request",
         statusCode: 404
       });
@@ -37,7 +45,7 @@ export class ExtrasService {
 
     const extra = this.extraRepository.create({
       name: createExtraDto.name,
-      branch: branch
+      restaurant: restaurant
     });
 
     const savedExtra = await this.extraRepository.save(extra);
@@ -45,9 +53,9 @@ export class ExtrasService {
     return { extra: savedExtra };
   }
 
-  async createExtraBranchDish(createExtraBranchDishDto: CreateExtraBranchDishDto) {
+  async createExtraBranch(createExtraBranchDto: CreateExtraBranchDto) {
     const extra = await this.extraRepository.findOne({
-      where: { id: createExtraBranchDishDto.extraId }
+      where: { id: createExtraBranchDto.extraId }
     });
     if (!extra) {
       throw new NotFoundException({
@@ -57,8 +65,42 @@ export class ExtrasService {
       });
     }
 
+    const branchDish = await this.branchRepository.findOne({
+      where: { id: createExtraBranchDto.branchId }
+    });
+    if (!branchDish) {
+      throw new NotFoundException({
+        message: ['Sede no encontrada.'],
+        error: "Bad Request",
+        statusCode: 404
+      });
+    }
+
+    const extraBranch = this.extraBranchRepository.create({
+      extra: extra,
+      branch: branchDish
+    });
+
+    const savedExtraBranch = await this.extraBranchRepository.save(extraBranch);
+
+    return { extraBranch: savedExtraBranch };
+  }
+
+  async createExtraBranchDish(createExtraBranchDishDto: CreateExtraBranchDishDto) {
+    const extraBranch = await this.extraBranchRepository.findOne({
+      where: { id: createExtraBranchDishDto.extraBranchId }
+    });
+    if (!extraBranch) {
+      throw new NotFoundException({
+        message: ['Extra en sede no encontrado.'],
+        error: "Bad Request",
+        statusCode: 404
+      });
+    }
+
     const branchDish = await this.branchDishRepository.findOne({
-      where: { id: createExtraBranchDishDto.branchDishId }
+      where: { id: createExtraBranchDishDto.branchDishId },
+      relations: ['dish']
     });
     if (!branchDish) {
       throw new NotFoundException({
@@ -69,7 +111,8 @@ export class ExtrasService {
     }
 
     const extraBranchDish = this.extraBranchDishRepository.create({
-      extra: extra,
+      isAvailable: createExtraBranchDishDto.isAvailable,
+      extraBranch: extraBranch,
       branchDish: branchDish
     });
 
@@ -79,8 +122,9 @@ export class ExtrasService {
   }
 
   async findById(id: number) {
-    const extra = await this.extraRepository.findOneBy({
-      id
+    const extra = await this.extraRepository.findOne({
+      where: { id },
+      relations: ['restaurant']
     });
     if (!extra) {
       throw new NotFoundException({
@@ -93,9 +137,26 @@ export class ExtrasService {
     return { extra };
   }
 
-  async findByBranchId(branchId: number) {
+  async findExtraBranchDishById(id: number) {
+    const extraBranchDish = await this.extraBranchDishRepository.findOne({
+      where: { id },
+      relations: ['extraBranch', 'branchDish', 'branchDish.dish']
+    });
+    if (!extraBranchDish) {
+      throw new NotFoundException({
+        message: ['Extra en plato en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { extraBranchDish };
+  }
+
+  async findByRestaurantId(restaurantId: number) {
     const extras = await this.extraRepository.find({
-      where : { branch: { id: branchId } }
+      where : { restaurant: { id: restaurantId } },
+      relations: ['restaurant']
     });
     if (!extras.length) {
       throw new NotFoundException({
@@ -106,6 +167,38 @@ export class ExtrasService {
     }
 
     return { extras };
+  }
+
+  async findByExtraIdAndBranchId(extraId: number, branchId: number) {
+    const extraBranch = await this.extraBranchRepository.findOne({
+      where: { extra: { id: extraId }, branch: { id: branchId } },
+      relations: ['extra', 'branch']
+    });
+    if (!extraBranch) {
+      throw new NotFoundException({
+        message: ['Extra en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { extraBranch };
+  }
+
+  async findByExtraBranchIdAndBranchDishId(extraBranchId: number, branchDishId: number) {
+    const extraBranchDish = await this.extraBranchDishRepository.findOne({
+      where: { extraBranch: { id: extraBranchId }, branchDish: { id: branchDishId } },
+      relations: ['extraBranch', 'branchDish', 'branchDish.dish']
+    });
+    if (!extraBranchDish) {
+      throw new NotFoundException({
+        message: ['Extra en plato en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { extraBranchDish };
   }
 
   async findByBranchDishId(branchDishId: number) {
@@ -138,6 +231,23 @@ export class ExtrasService {
     await this.extraRepository.update(id, updateExtraDto);
 
     return this.findById(id);
+  }
+
+  async updateExtraBranchDishById(id: number, updateExtraBranchDishDto: UpdateExtraBranchDishDto) {
+    const extraBranchDish = await this.extraBranchDishRepository.findOneBy({
+      id
+    });
+    if (!extraBranchDish) {
+      throw new NotFoundException({
+        message: ['Extra en plato en sede no encontrado.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    await this.extraBranchDishRepository.update(id, updateExtraBranchDishDto);
+
+    return this.findExtraBranchDishById(id);
   }
 
   async deleteExtraById(extraId: number) {

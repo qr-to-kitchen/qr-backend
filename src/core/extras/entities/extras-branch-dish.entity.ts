@@ -1,26 +1,34 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
   ManyToOne,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { BranchDish } from '../../branches-dishes/branches-dishes.entity';
-import { Extra } from './extras.entity';
+import { ExtraBranch } from './extras-branches.entity';
 
 @Entity()
 export class ExtraBranchDish {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  isAvailable: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToOne(() => Extra)
-  extra: Extra;
+  @ManyToOne(() => ExtraBranch)
+  extraBranch: ExtraBranch;
 
   @ManyToOne(() => BranchDish)
   branchDish: BranchDish;

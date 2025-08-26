@@ -6,7 +6,7 @@ export class CreateExtraDto {
   @ApiProperty({ example: 'string' })
   name: string;
 
-  @IsNumber({}, { message: 'El ID de la sede debe ser un número.' })
+  @IsNumber({}, { message: 'El ID del restaurante debe ser un número.' })
   @ApiProperty({ example: 1 })
-  branchId: number;
+  restaurantId: number;
 }
