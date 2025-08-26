@@ -38,6 +38,6 @@ export class User {
   @OneToOne(() => Restaurant, (restaurant) => restaurant.user)
   restaurant: Restaurant;
 
-  @OneToOne(() => Branch)
+  @OneToOne(() => Branch, (branch) => branch.user)
   branch: Branch;
 }
