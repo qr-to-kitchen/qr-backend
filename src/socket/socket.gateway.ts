@@ -11,23 +11,23 @@ import { Socket } from 'socket.io';
   }
 })
 export class SocketGateway {
-  @SubscribeMessage('joinRestaurantRoom')
-  joinRestaurantRoom(@ConnectedSocket() client: Socket, @MessageBody() restaurantId: string) {
-    client.join(`restaurant-${restaurantId}`);
+  @SubscribeMessage('joinBranchRoom')
+  joinBranchRoom(@ConnectedSocket() client: Socket, @MessageBody() branchId: string) {
+    client.join(`branch-${branchId}`);
   }
 
-  @SubscribeMessage('joinClientRoom')
-  joinClientRoom(@ConnectedSocket() client: Socket, @MessageBody() clientId: string) {
-    client.join(`restaurant-${clientId}`);
+  @SubscribeMessage('joinOrderRoom')
+  joinOrderRoom(@ConnectedSocket() client: Socket, @MessageBody() orderId: string) {
+    client.join(`order-${orderId}`);
   }
 
   @SubscribeMessage('placeOrder')
-  placeOrder( @ConnectedSocket() client: Socket, @MessageBody() data: { restaurantId: string; order: any }) {
-    client.to(`restaurant-${data.restaurantId}`).emit('newOrder', data.order);
+  placeOrder( @ConnectedSocket() client: Socket, @MessageBody() data: { branchId: string }) {
+    client.to(`branch-${data.branchId}`).emit('newOrder');
   }
 
-  @SubscribeMessage('updateOrderStatus')
-  updateOrderStatus(@ConnectedSocket() client: Socket, @MessageBody() data: { clientRoom: string; status: string }) {
-    client.to(`client-${data.clientRoom}`).emit('orderUpdate', data.status);
+  @SubscribeMessage('updateOrder')
+  updateOrder(@ConnectedSocket() client: Socket, @MessageBody() data: { orderId: string }) {
+    client.to(`order-${data.orderId}`).emit('orderUpdate');
   }
 }
