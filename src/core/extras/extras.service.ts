@@ -169,6 +169,22 @@ export class ExtrasService {
     return { extras };
   }
 
+  async findByBranchId(branchId: number) {
+    const extraBranches = await this.extraBranchRepository.find({
+      where : { branch: { id: branchId } },
+      relations: ['extra', 'branch']
+    });
+    if (!extraBranches.length) {
+      throw new NotFoundException({
+        message: ['Extras en sede no encontrados.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { extraBranches };
+  }
+
   async findByExtraIdAndBranchId(extraId: number, branchId: number) {
     const extraBranch = await this.extraBranchRepository.findOne({
       where: { extra: { id: extraId }, branch: { id: branchId } },

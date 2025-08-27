@@ -45,6 +45,11 @@ export class ExtrasController {
     return this.extrasService.findByRestaurantId(id);
   }
 
+  @Get('extraBranch/branch/:id')
+  getExtraBranchByBranchId(@Param('id', ParseIntPipe) id: number) {
+    return this.extrasService.findByBranchId(id);
+  }
+
   @Get('extra/:extraId/branch/:branchId')
   getExtraBranchByExtraIdAndBranchId(@Param('extraId', ParseIntPipe) extraId: number, @Param('branchId', ParseIntPipe) branchId: number) {
     return this.extrasService.findByExtraIdAndBranchId(extraId, branchId);
