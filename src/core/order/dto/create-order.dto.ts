@@ -14,7 +14,7 @@ export class CreateOrderDto {
   tableNumber: number;
 
   @IsEnum(OrderStatus, { message: 'El estado enviado es incorrecto.' })
-  @ApiProperty({ enum: OrderStatus, example: OrderStatus.RECIBIDO })
+  @ApiProperty({ enum: OrderStatus, example: OrderStatus.COCINANDO })
   status: OrderStatus;
 
   @IsNumber({}, { message: 'El ID de la sede debe ser un número.' })

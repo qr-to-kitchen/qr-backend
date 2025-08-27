@@ -159,7 +159,11 @@ export class OrderService {
   async findByBranchId(branchId: number) {
     const orders = await this.orderRepository.find({
       where: { branch: { id: branchId } },
-      relations: ['items', 'items.branchDish', 'items.branchDish.dish']
+      relations: [
+        'branch',
+        'items.branchDish.dish',
+        'items.itemExtras.extraBranchDish.extraBranch.extra'
+      ]
     });
     if (!orders.length) {
       throw new NotFoundException({
@@ -207,7 +211,11 @@ export class OrderService {
   async findById(id: number) {
     const order =  await this.orderRepository.findOne({
       where: { id },
-      relations: ['branch', 'items', 'items.branchDish', 'items.branchDish.dish']
+      relations: [
+        'branch',
+        'items.branchDish.dish',
+        'items.itemExtras.extraBranchDish.extraBranch.extra'
+      ]
     });
     if (!order) {
       throw new NotFoundException({
