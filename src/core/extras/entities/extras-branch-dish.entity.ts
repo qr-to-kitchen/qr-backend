@@ -18,6 +18,9 @@ export class ExtraBranchDish {
   @Column()
   isAvailable: boolean;
 
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
+  customPrice: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

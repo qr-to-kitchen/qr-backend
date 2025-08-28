@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class CreateExtraDto {
   @IsNotEmpty({ message: 'El nombre del extra es obligatorio.' })
@@ -9,4 +10,10 @@ export class CreateExtraDto {
   @IsNumber({}, { message: 'El ID del restaurante debe ser un número.' })
   @ApiProperty({ example: 1 })
   restaurantId: number;
+
+  @Type(() => Number)
+  @IsNumber({}, { message: 'El precio base debe ser un número.' })
+  @Min(0, { message: 'El precio base no puede ser negativo.' })
+  @ApiProperty({ example: 10 })
+  basePrice: number;
 }

@@ -14,6 +14,9 @@ export class OrderItem {
   @Column('decimal', { precision: 10, scale: 2 })
   unitPrice: number;
 
+  @Column({ nullable: true })
+  comment: string;
+
   @ManyToOne(() => Order)
   order: Order;
 

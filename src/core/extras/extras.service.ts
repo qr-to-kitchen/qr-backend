@@ -45,6 +45,7 @@ export class ExtrasService {
 
     const extra = this.extraRepository.create({
       name: createExtraDto.name,
+      basePrice: createExtraDto.basePrice,
       restaurant: restaurant
     });
 

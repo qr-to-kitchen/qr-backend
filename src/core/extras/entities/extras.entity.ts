@@ -18,6 +18,9 @@ export class Extra {
   @Column()
   name: string;
 
+  @Column('decimal', { precision: 10, scale: 2 })
+  basePrice: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

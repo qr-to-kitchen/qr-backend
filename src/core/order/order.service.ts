@@ -76,6 +76,7 @@ export class OrderService {
       items: createOrderDto.items.map(itemDto => ({
         quantity: itemDto.quantity,
         unitPrice: itemDto.unitPrice,
+        comment: itemDto.comment,
         branchDish: { id: itemDto.branchDishId },
         itemExtras: (itemDto.extraBranchDishIds ?? []).map(extraBranchDishId => ({
           extraBranchDish: { id: extraBranchDishId }
