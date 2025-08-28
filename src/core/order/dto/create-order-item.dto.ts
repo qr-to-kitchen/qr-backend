@@ -1,5 +1,6 @@
 import { ArrayNotEmpty, IsArray, IsNumber, IsOptional, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ExtraBranchDish } from '../../extras/entities/extras-branch-dish.entity';
 
 export class CreateOrderItemDto {
   @IsNumber({}, { message: 'La cantidad debe ser un número.' })
@@ -23,4 +24,5 @@ export class CreateOrderItemDto {
   extraBranchDishIds: number[];
 
   unitPrice: number;
+  extraUnitPrices?: Record<number, number>;
 }

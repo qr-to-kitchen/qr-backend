@@ -53,9 +53,11 @@ export class OrderService {
       itemDto.unitPrice = branchDish.customPrice || branchDish.dish.basePrice;
 
       if (itemDto.extraBranchDishIds?.length) {
+        itemDto.extraUnitPrices = {};
         for (const extraBranchDishId of itemDto.extraBranchDishIds) {
           const extraBranchDish = await this.extraBranchDishRepository.findOne({
-            where: { id: extraBranchDishId }
+            where: { id: extraBranchDishId },
+            relations: ['extraBranch.extra']
           });
           if (!extraBranchDish) {
             throw new NotFoundException({
@@ -64,6 +66,11 @@ export class OrderService {
               statusCode: 404
             });
           }
+
+          const extraUnitPrice = extraBranchDish.customPrice || extraBranchDish.extraBranch.extra.basePrice;
+
+          itemDto.unitPrice = itemDto.unitPrice + extraUnitPrice;
+          itemDto.extraUnitPrices[extraBranchDishId] = extraUnitPrice;
         }
       }
     }
@@ -79,7 +86,8 @@ export class OrderService {
         comment: itemDto.comment,
         branchDish: { id: itemDto.branchDishId },
         itemExtras: (itemDto.extraBranchDishIds ?? []).map(extraBranchDishId => ({
-          extraBranchDish: { id: extraBranchDishId }
+          extraBranchDish: { id: extraBranchDishId },
+          unitPrice: itemDto.extraUnitPrices?.[extraBranchDishId]
         }))
       }))
     });

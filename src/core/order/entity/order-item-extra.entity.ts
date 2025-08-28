@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { OrderItem } from './order-item.entity';
 import { ExtraBranchDish } from '../../extras/entities/extras-branch-dish.entity';
 
@@ -6,6 +6,9 @@ import { ExtraBranchDish } from '../../extras/entities/extras-branch-dish.entity
 export class OrderItemExtra {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  unitPrice: number;
 
   @ManyToOne(() => OrderItem)
   orderItem: OrderItem;
