@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order, OrderStatus } from './entity/order.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { OrderItem } from './entity/order-item.entity';
 import { Branch } from '../branches/branches.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -168,6 +168,28 @@ export class OrderService {
   async findByBranchId(branchId: number) {
     const orders = await this.orderRepository.find({
       where: { branch: { id: branchId } },
+      relations: [
+        'branch',
+        'items.branchDish.dish',
+        'items.itemExtras.extraBranchDish.extraBranch.extra'
+      ]
+    });
+    if (!orders.length) {
+      throw new NotFoundException({
+        message: ['Órdenes no encontradas.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { orders };
+  }
+
+  async findActiveByBranchId(branchId: number) {
+    const statuses = [OrderStatus.CREADO, OrderStatus.COCINANDO, OrderStatus.LISTO];
+
+    const orders = await this.orderRepository.find({
+      where: { branch: { id: branchId }, status: In(statuses) },
       relations: [
         'branch',
         'items.branchDish.dish',

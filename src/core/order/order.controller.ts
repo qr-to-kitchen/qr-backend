@@ -28,6 +28,11 @@ export class OrderController {
     return this.orderService.findByBranchId(id);
   }
 
+  @Get('branch/active/:id')
+  getOrdersActiveByBranchId(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.findActiveByBranchId(id);
+  }
+
   @Get('branch/:id/:page')
   getOrderByBranchIdAndPage(@Param('id', ParseIntPipe) id: number, @Param('page', ParseIntPipe) page: number) {
     return this.orderService.findByBranchIdAndPage(id, page);
