@@ -5,6 +5,7 @@ import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { OrderStatus } from './entity/order.entity';
 import { ApiQuery } from '@nestjs/swagger';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { GetOrdersByFilterDto } from './dto/get-orders-by-filter.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -21,6 +22,12 @@ export class OrderController {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   addItemToOrder(@Param('id', ParseIntPipe) id: number, @Body() createOrderItemDto: CreateOrderItemDto) {
     return this.orderService.addItemToOrder(id, createOrderItemDto);
+  }
+
+  @Post('filter')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  getOrderByFilter(@Body() getOrdersByFilterDto: GetOrdersByFilterDto) {
+    return this.orderService.getOrderByFilter(getOrdersByFilterDto);
   }
 
   @Get('branch/:id')

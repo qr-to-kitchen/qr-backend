@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order, OrderStatus } from './entity/order.entity';
-import { In, Repository } from 'typeorm';
+import { Between, In, Repository } from 'typeorm';
 import { OrderItem } from './entity/order-item.entity';
 import { Branch } from '../branches/branches.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
 import { ExtraBranchDish } from '../extras/entities/extras-branch-dish.entity';
+import { GetOrdersByFilterDto } from './dto/get-orders-by-filter.dto';
 
 @Injectable()
 export class OrderService {
@@ -163,6 +164,33 @@ export class OrderService {
     }
 
     return { order: orderCreated };
+  }
+
+  async getOrderByFilter(getOrderByFilterDto: GetOrdersByFilterDto) {
+    const statuses = [OrderStatus.ENTREGADO, OrderStatus.CANCELADO];
+    const [orders, total] = await this.orderRepository.findAndCount({
+      skip: (getOrderByFilterDto.page - 1) * 10,
+      take: 10,
+      where: {
+        branch: { id: getOrderByFilterDto.branchId },
+        createdAt: Between(getOrderByFilterDto.startDate, getOrderByFilterDto.endDate),
+        status: In(statuses)
+      },
+      relations: [
+        'branch',
+        'items.branchDish.dish',
+        'items.itemExtras.extraBranchDish.extraBranch.extra'
+      ]
+    });
+    if (!orders.length) {
+      throw new NotFoundException({
+        message: ['Órdenes no encontradas.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { orders, total };
   }
 
   async findByBranchId(branchId: number) {
