@@ -321,7 +321,7 @@ export class OrderService {
       });
     }
 
-    if (status.toString() === OrderStatus.LISTO) {
+    if (status.toString() === OrderStatus.ENTREGADO || status.toString() === OrderStatus.CANCELADO) {
       await this.orderRepository.update(id, { status: status, readyAt: new Date() });
     } else {
       await this.orderRepository.update(id, { status });
