@@ -22,6 +22,11 @@ export class CreateDishDto {
   @ApiProperty({ example: 1 })
   restaurantId: number;
 
+  @Type(() => Number)
+  @IsNumber({}, { message: 'El ID de la categoría debe ser un número.' })
+  @ApiProperty({ example: 1 })
+  categoryId: number;
+
   @ApiProperty({ type: 'string', format: 'binary' })
   file: Express.Multer.File;
 }

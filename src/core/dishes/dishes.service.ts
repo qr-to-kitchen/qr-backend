@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { ImagesService } from '../images/images.service';
+import { Category } from '../categories/categories.entity';
 
 @Injectable()
 export class DishesService {
@@ -15,6 +16,8 @@ export class DishesService {
     private dishRepository: Repository<Dish>,
     @InjectRepository(Restaurant)
     private restaurantRepository: Repository<Restaurant>,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
     private readonly imagesService: ImagesService
   ) {}
 
@@ -30,6 +33,17 @@ export class DishesService {
       });
     }
 
+    const category = await this.categoryRepository.findOne({
+      where: { id: createDishDto.categoryId }
+    });
+    if (!category) {
+      throw new NotFoundException({
+        message: ['Categoría no encontrada.'],
+        error: "Bad Request",
+        statusCode: 404
+      });
+    }
+
     const imageUrl = await this.imagesService.uploadImageReturnUrl(file);
 
     const dish = this.dishRepository.create({
@@ -37,7 +51,8 @@ export class DishesService {
       description: createDishDto.description,
       basePrice: createDishDto.basePrice,
       imageUrl: imageUrl,
-      restaurant: restaurant
+      restaurant: restaurant,
+      category: category,
     });
 
     const savedDish = await this.dishRepository.save(dish);
@@ -48,7 +63,7 @@ export class DishesService {
   async findByRestaurantId(restaurantId: number) {
     const dishes = await this.dishRepository.find({
       where: { restaurant: { id: restaurantId } },
-      relations: ['restaurant']
+      relations: ['restaurant', 'category']
     });
     if (!dishes.length) {
       throw new NotFoundException({
@@ -62,8 +77,9 @@ export class DishesService {
   }
 
   async findById(id: number) {
-    const dish = await this.dishRepository.findOneBy({
-      id
+    const dish =  await this.dishRepository.findOne({
+      where: { id },
+      relations: ['restaurant', 'category']
     });
     if (!dish) {
       throw new NotFoundException({
@@ -86,6 +102,22 @@ export class DishesService {
         error: 'Not Found',
         statusCode: 404
       });
+    }
+
+    if (updateDishDto.categoryId) {
+      const category = await this.categoryRepository.findOne({
+        where: { id: updateDishDto.categoryId }
+      });
+      if (!category) {
+        throw new NotFoundException({
+          message: ['Categoría no encontrada.'],
+          error: "Bad Request",
+          statusCode: 404
+        });
+      }
+
+      updateDishDto.category = category;
+      delete updateDishDto.categoryId;
     }
 
     await this.dishRepository.update(id, updateDishDto);
