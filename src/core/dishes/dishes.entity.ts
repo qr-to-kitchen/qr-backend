@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
+import { Category } from '../categories/categories.entity';
 
 @Entity()
 export class Dish {
@@ -38,6 +39,9 @@ export class Dish {
 
   @ManyToOne(() => Restaurant)
   restaurant: Restaurant;
+
+  @ManyToOne(() => Category)
+  category: Category;
 
   @OneToMany(() => BranchDish, (branchDish) => branchDish.dish)
   branchDishes: BranchDish[];

@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToMa
 import { User } from '../users/entity/users.entity';
 import { Branch } from '../branches/branches.entity';
 import { Dish } from '../dishes/dishes.entity';
+import { Category } from '../categories/categories.entity';
 
 @Entity()
 export class Restaurant {
@@ -29,4 +30,7 @@ export class Restaurant {
 
   @OneToMany(() => Dish, (dish) => dish.restaurant)
   dishes: Dish[];
+
+  @OneToMany(() => Category, (category) => category.restaurant)
+  categories: Category[];
 }

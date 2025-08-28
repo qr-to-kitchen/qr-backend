@@ -14,6 +14,7 @@ import { ConfigurationModule } from './core/configuration/configuration.module';
 import { StatisticsModule } from './core/statistics/statistics.module';
 import { ExtrasModule } from './core/extras/extras.module';
 import { ImagesModule } from './core/images/images.module';
+import { CategoriesModule } from './core/categories/categories.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { ImagesModule } from './core/images/images.module';
     ConfigurationModule,
     StatisticsModule,
     ExtrasModule,
-    ImagesModule
+    ImagesModule,
+    CategoriesModule
   ],
   controllers: [AppController],
   providers: [AppService],
