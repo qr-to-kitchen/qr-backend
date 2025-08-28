@@ -185,6 +185,28 @@ export class OrderService {
     return { orders };
   }
 
+  async findByBranchIdAndPage(branchId: number, page: number) {
+    const [orders, total] = await this.orderRepository.findAndCount({
+      skip: (page - 1) * 10,
+      take: 10,
+      where: { branch: { id: branchId } },
+      relations: [
+        'branch',
+        'items.branchDish.dish',
+        'items.itemExtras.extraBranchDish.extraBranch.extra'
+      ]
+    });
+    if (!orders.length) {
+      throw new NotFoundException({
+        message: ['Órdenes no encontradas.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { orders, total };
+  }
+
   async findByRestaurantId(restaurantId: number) {
     const orders = await this.orderRepository.find({
       where: { branch: { restaurant: { id: restaurantId } } },
