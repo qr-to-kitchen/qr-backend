@@ -51,7 +51,7 @@ export class OrderService {
         });
       }
 
-      itemDto.unitPrice = branchDish.customPrice || branchDish.dish.basePrice;
+      itemDto.unitPrice = Number(branchDish.customPrice || branchDish.dish.basePrice);
 
       if (itemDto.extraBranchDishIds?.length) {
         itemDto.extraUnitPrices = {};
@@ -68,7 +68,7 @@ export class OrderService {
             });
           }
 
-          const extraUnitPrice = extraBranchDish.customPrice || extraBranchDish.extraBranch.extra.basePrice;
+          const extraUnitPrice = Number(extraBranchDish.customPrice || extraBranchDish.extraBranch.extra.basePrice);
 
           itemDto.unitPrice = itemDto.unitPrice + extraUnitPrice;
           itemDto.extraUnitPrices[extraBranchDishId] = extraUnitPrice;
@@ -98,14 +98,10 @@ export class OrderService {
     const orderCreated = await this.orderRepository.findOne({
       where: { id: savedOrder.id },
       relations: [
-        'branch',
-        'items',
-        'items.branchDish',
-        'items.branchDish.dish',
-        'items.itemExtras',
-        'items.itemExtras.extraBranchDish',
-        'items.itemExtras.extraBranchDish.extra'
-      ]
+      'branch',
+      'items.branchDish.dish',
+      'items.itemExtras.extraBranchDish.extraBranch.extra'
+    ]
     });
     if (!orderCreated) {
       throw new NotFoundException({

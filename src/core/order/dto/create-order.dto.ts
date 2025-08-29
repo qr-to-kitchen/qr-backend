@@ -19,6 +19,7 @@ export class CreateOrderDto {
 
   @IsNumber({}, { message: 'El ID de la sede debe ser un número.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   branchId: number;
 
   @IsArray({ message: 'Los items deben ser una lista.' })
