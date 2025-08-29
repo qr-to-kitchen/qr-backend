@@ -70,6 +70,24 @@ export class BranchesDishesService {
     return { branchesDishes };
   }
 
+
+
+  async findByBranchIdAndCategoryId(branchId: number, categoryId: number) {
+    const branchesDishes = await this.branchDishRepository.find({
+      where: { branch: { id: branchId }, dish: { category: { id: categoryId } }, isAvailable: true },
+      relations: ['branch.restaurant', 'dish.category']
+    });
+    if (!branchesDishes.length) {
+      throw new NotFoundException({
+        message: ['Platos en sede no encontrados.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { branchesDishes };
+  }
+
   async findByDishId(dishId: number) {
     const branchesDishes = await this.branchDishRepository.find({
       where: { dish: { id: dishId } },

@@ -60,7 +60,7 @@ export class ExtrasController {
     return this.extrasService.findByExtraBranchIdAndBranchDishId(extraBranchId, branchDishId);
   }
 
-  @Get('branch-dish/:id')
+  @Get('extraBranchDish/branchDish/:id')
   getExtraBranchDishByBranchId(@Param('id', ParseIntPipe) id: number) {
     return this.extrasService.findByBranchDishId(id);
   }
