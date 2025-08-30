@@ -15,6 +15,7 @@ import { StatisticsModule } from './core/statistics/statistics.module';
 import { ExtrasModule } from './core/extras/extras.module';
 import { ImagesModule } from './core/images/images.module';
 import { CategoriesModule } from './core/categories/categories.module';
+import { QrModule } from './core/qr/qr.module';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { CategoriesModule } from './core/categories/categories.module';
     StatisticsModule,
     ExtrasModule,
     ImagesModule,
-    CategoriesModule
+    CategoriesModule,
+    QrModule
   ],
   controllers: [AppController],
   providers: [AppService],

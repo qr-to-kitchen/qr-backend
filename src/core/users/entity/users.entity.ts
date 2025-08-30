@@ -3,7 +3,7 @@ import { Restaurant } from '../../restaurants/restaurants.entity';
 import { Branch } from '../../branches/branches.entity';
 
 export enum UserRole {
-  ADMIN = 'ADMIN', BRANCH = 'BRANCH'
+  ADMIN = 'ADMIN', BRANCH = 'BRANCH', SUPER_ADMIN = 'SUPER_ADMIN',
 }
 
 @Entity()
