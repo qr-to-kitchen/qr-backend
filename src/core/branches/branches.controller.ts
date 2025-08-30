@@ -67,6 +67,12 @@ export class BranchesController {
     return this.branchesService.updateById(id, updateBranchDto);
   }
 
+  @Put('dailyCode/:id')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  refreshDailyCodeByBranchId(@Param('id', ParseIntPipe) id: number) {
+    return this.branchesService.refreshDailyCodeByBranchId(id);
+  }
+
   @Delete(':id')
   deleteById(@Param('id', ParseIntPipe) id: number) {
     return this.branchesService.deleteById(id);

@@ -53,8 +53,12 @@ export class BranchesService {
       });
     }
 
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
     const branch = this.branchRepository.create({
       address: createBranchDto.address,
+      dailyCode: code,
+      dailyCodeUpdatedAt: new Date(),
       user: user,
       restaurant: restaurant
     });
@@ -99,8 +103,12 @@ export class BranchesService {
         });
       }
 
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+
       const branch = branchRepo.create({
         address: createBranchUserDto.branch.address,
+        dailyCode: code,
+        dailyCodeUpdatedAt: new Date(),
         user: savedUser,
         restaurant: restaurant
       });
@@ -185,6 +193,25 @@ export class BranchesService {
     }
 
     await this.branchRepository.update(id, updateBranchDto);
+
+    return this.findById(id);
+  }
+
+  async refreshDailyCodeByBranchId(id: number) {
+    const branch = await this.branchRepository.findOneBy({
+      id
+    });
+    if (!branch) {
+      throw new NotFoundException({
+        message: ['Sede no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await this.branchRepository.update(id, { dailyCode: code, dailyCodeUpdatedAt: new Date() });
 
     return this.findById(id);
   }

@@ -20,6 +20,12 @@ export class Branch {
   @Column()
   address: string;
 
+  @Column({ nullable: true })
+  dailyCode: string;
+
+  @Column({ nullable: true })
+  dailyCodeUpdatedAt: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 
