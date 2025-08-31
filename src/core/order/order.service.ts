@@ -336,7 +336,7 @@ export class OrderService {
     for (const itemDto of restoreOrderDto.items) {
       const branchDish = await this.branchDishRepository.findOne({
         where: { id: itemDto.branchDishId, branch: { id: restoreOrderDto.branchId } },
-        relations: ['dish']
+        relations: ['branch.restaurant', 'dish.category']
       });
       if (!branchDish) {
         throw new NotFoundException({
