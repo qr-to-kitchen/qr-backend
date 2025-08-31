@@ -6,6 +6,7 @@ import { OrderStatus } from './entity/order.entity';
 import { ApiQuery } from '@nestjs/swagger';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { GetOrdersByFilterDto } from './dto/get-orders-by-filter.dto';
+import { RestoreOrderDto } from './dto/restore-order.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -59,6 +60,12 @@ export class OrderController {
   @Get(':id')
   getOrderById(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.findById(id);
+  }
+
+  @Post('restore')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  restore(@Body() restoreOrderDto: RestoreOrderDto) {
+    return this.orderService.restore(restoreOrderDto);
   }
 
   @Put(':id')

@@ -9,6 +9,12 @@ import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
 import { ExtraBranchDish } from '../extras/entities/extras-branch-dish.entity';
 import { GetOrdersByFilterDto } from './dto/get-orders-by-filter.dto';
+import { RestoreOrderDto } from './dto/restore-order.dto';
+import {
+  OrderItemExtraRestoredDto,
+  OrderItemRestoredDto,
+  OrderRestoredDto,
+} from './dto/order-restored.dto';
 
 @Injectable()
 export class OrderService {
@@ -303,6 +309,81 @@ export class OrderService {
     }
 
     return { order };
+  }
+
+  async restore(restoreOrderDto: RestoreOrderDto) {
+    const orderRestored: OrderRestoredDto = {
+      description: restoreOrderDto.description,
+      tableNumber: restoreOrderDto.tableNumber,
+      branchId: 0,
+      items: [],
+      orderTotal: 0
+    };
+
+    const branch = await this.branchRepository.findOne({
+      where: { id: restoreOrderDto.branchId }
+    });
+    if (!branch) {
+      throw new NotFoundException({
+        message: ['Error en la restauración (sede).'],
+        error: "Bad Request",
+        statusCode: 404
+      });
+    }
+
+    orderRestored.branchId = branch.id;
+
+    for (const itemDto of restoreOrderDto.items) {
+      const branchDish = await this.branchDishRepository.findOne({
+        where: { id: itemDto.branchDishId, branch: { id: restoreOrderDto.branchId } },
+        relations: ['dish']
+      });
+      if (!branchDish) {
+        throw new NotFoundException({
+          message: [`Error en la restauración (plato)`],
+          error: "Bad Request",
+          statusCode: 404
+        });
+      }
+
+      const orderItemRestored: OrderItemRestoredDto = {
+        quantity: itemDto.quantity,
+        unitPrice: Number(branchDish.customPrice || branchDish.dish.basePrice),
+        total: 0,
+        comment: itemDto.comment,
+        branchDish: branchDish,
+        itemExtras: []
+      };
+
+      if (itemDto.extraBranchDishIds) {
+        for (const extraBranchDishId of itemDto.extraBranchDishIds) {
+          const extraBranchDish = await this.extraBranchDishRepository.findOne({
+            where: { id: extraBranchDishId, branchDish: { id: itemDto.branchDishId } },
+            relations: ['extraBranch.extra']
+          });
+          if (!extraBranchDish) {
+            throw new NotFoundException({
+              message: [`Error en la restauración (extra)`],
+              error: "Bad Request",
+              statusCode: 404
+            });
+          }
+
+          const orderItemExtraRestoredDto: OrderItemExtraRestoredDto = {
+            unitPrice: Number(extraBranchDish.customPrice || extraBranchDish.extraBranch.extra.basePrice),
+            extraBranchDish: extraBranchDish
+          };
+
+          orderItemRestored.itemExtras.push(orderItemExtraRestoredDto);
+          orderItemRestored.unitPrice = orderItemRestored.unitPrice + orderItemExtraRestoredDto.unitPrice;
+        }
+      }
+      orderItemRestored.total = orderItemRestored.unitPrice * orderItemRestored.quantity;
+      orderRestored.items.push(orderItemRestored);
+      orderRestored.orderTotal = orderRestored.orderTotal + orderItemRestored.total;
+    }
+
+    return { order: orderRestored };
   }
 
   async updateStatusById(id: number, status: OrderStatus) {
