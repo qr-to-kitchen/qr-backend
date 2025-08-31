@@ -8,7 +8,6 @@ import { Between, DataSource, In, Repository } from 'typeorm';
 import { OrderItem, OrderStatusItem } from './entity/order-item.entity';
 import { Branch } from '../branches/branches.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
 import { ExtraBranchDish } from '../extras/entities/extras-branch-dish.entity';
 import { GetOrdersByFilterDto } from './dto/get-orders-by-filter.dto';
@@ -20,6 +19,7 @@ import {
 } from './dto/order-restored.dto';
 import { RetrieveOrderDto } from './dto/retrieve-order.dto';
 import { UpdateOrderItemsDto } from './dto/update-order-items.dto';
+import { AddItemToOrderDto } from './dto/add-item-to-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -27,8 +27,6 @@ export class OrderService {
   constructor(
     @InjectRepository(Order)
     private orderRepository: Repository<Order>,
-    @InjectRepository(OrderItem)
-    private orderItemRepository: Repository<OrderItem>,
     @InjectRepository(BranchDish)
     private branchDishRepository: Repository<BranchDish>,
     @InjectRepository(Branch)
@@ -97,6 +95,7 @@ export class OrderService {
         quantity: itemDto.quantity,
         unitPrice: itemDto.unitPrice,
         comment: itemDto.comment,
+        status: itemDto.status,
         branchDish: { id: itemDto.branchDishId },
         itemExtras: (itemDto.extraBranchDishIds ?? []).map(extraBranchDishId => ({
           extraBranchDish: { id: extraBranchDishId },
@@ -126,52 +125,81 @@ export class OrderService {
     return { order: orderCreated };
   }
 
-  async addItemToOrder(orderId: number, createOrderItemDto: CreateOrderItemDto) {
-    const order = await this.orderRepository.findOne({
-      where: { id: orderId }
-    });
-    if (!order) {
-      throw new NotFoundException({
-        message: [`Orden con ID ${orderId} no encontrada`],
-        error: "Bad Request",
-        statusCode: 404
+  async addItemToOrder(orderId: number, addItemToOrderDto: AddItemToOrderDto) {
+    await this.dataSource.transaction(async (manager) => {
+      const orderRepo = manager.getRepository(Order);
+      const orderItemRepo = manager.getRepository(OrderItem);
+      const branchDishRepo = manager.getRepository(BranchDish);
+      const extraBranchDishRepo = manager.getRepository(ExtraBranchDish);
+
+      const order = await orderRepo.findOne({
+        where: { id: orderId }
       });
-    }
+      if (!order) {
+        throw new NotFoundException({
+          message: ['Orden no encontrada'],
+          error: "Bad Request",
+          statusCode: 404
+        });
+      }
 
-    const branchDish = await this.branchDishRepository.findOne({
-      where: { id: createOrderItemDto.branchDishId },
-      relations: ['dish']
+      for (const itemDto of addItemToOrderDto.items) {
+        const branchDish = await branchDishRepo.findOne({
+          where: { id: itemDto.branchDishId },
+          relations: ['dish']
+        });
+        if (!branchDish) {
+          throw new NotFoundException({
+            message: [`Plato no encontrado`],
+            error: "Bad Request",
+            statusCode: 404
+          });
+        }
+
+        itemDto.unitPrice = Number(branchDish.customPrice || branchDish.dish.basePrice);
+
+        if (itemDto.extraBranchDishIds?.length) {
+          itemDto.extraUnitPrices = {};
+          for (const extraBranchDishId of itemDto.extraBranchDishIds) {
+            const extraBranchDish = await extraBranchDishRepo.findOne({
+              where: { id: extraBranchDishId },
+              relations: ['extraBranch.extra']
+            });
+            if (!extraBranchDish) {
+              throw new NotFoundException({
+                message: [`Extra en Plato en Sede no encontrado`],
+                error: "Bad Request",
+                statusCode: 404
+              });
+            }
+
+            const extraUnitPrice = Number(extraBranchDish.customPrice || extraBranchDish.extraBranch.extra.basePrice);
+
+            itemDto.unitPrice = itemDto.unitPrice + extraUnitPrice;
+            itemDto.extraUnitPrices[extraBranchDishId] = extraUnitPrice;
+          }
+        }
+
+        const orderItem = orderItemRepo.create({
+          quantity: itemDto.quantity,
+          unitPrice: itemDto.unitPrice,
+          comment: itemDto.comment,
+          status: itemDto.status,
+          order: { id: orderId },
+          branchDish: { id: itemDto.branchDishId },
+          itemExtras: (itemDto.extraBranchDishIds ?? []).map(extraBranchDishId => ({
+            extraBranchDish: { id: extraBranchDishId },
+            unitPrice: itemDto.extraUnitPrices?.[extraBranchDishId]
+          }))
+        });
+
+        await orderItemRepo.save(orderItem);
+
+        await orderRepo.update(orderId, { status: OrderStatus.CREADO });
+      }
     });
-    if (!branchDish) {
-      throw new NotFoundException({
-        message: [`Plato con ID ${createOrderItemDto.branchDishId} no encontrado`],
-        error: "Bad Request",
-        statusCode: 404
-      });
-    }
 
-    const orderItem = this.orderItemRepository.create({
-      quantity: createOrderItemDto.quantity,
-      unitPrice: branchDish.customPrice || branchDish.dish.basePrice,
-      order: order,
-      branchDish: branchDish
-    });
-
-    await this.orderItemRepository.save(orderItem);
-
-    const orderCreated = await this.orderRepository.findOne({
-      where: { id: orderId },
-      relations: ['branch', 'items', 'items.branchDish', 'items.branchDish.dish']
-    });
-    if (!orderCreated) {
-      throw new NotFoundException({
-        message: ['Orden no encontrada.'],
-        error: 'Not Found',
-        statusCode: 404
-      });
-    }
-
-    return { order: orderCreated };
+    return this.findById(orderId);
   }
 
   async getOrderByFilter(getOrderByFilterDto: GetOrdersByFilterDto) {

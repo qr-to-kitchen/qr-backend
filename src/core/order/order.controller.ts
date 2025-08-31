@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { OrderStatus } from './entity/order.entity';
 import { ApiQuery } from '@nestjs/swagger';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -9,6 +8,7 @@ import { GetOrdersByFilterDto } from './dto/get-orders-by-filter.dto';
 import { RestoreOrderDto } from './dto/restore-order.dto';
 import { RetrieveOrderDto } from './dto/retrieve-order.dto';
 import { UpdateOrderItemsDto } from './dto/update-order-items.dto';
+import { AddItemToOrderDto } from './dto/add-item-to-order.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -21,10 +21,10 @@ export class OrderController {
     return this.orderService.create(createOrderDto);
   }
 
-  @Post(':id/item')
+  @Put('add-item/:id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  addItemToOrder(@Param('id', ParseIntPipe) id: number, @Body() createOrderItemDto: CreateOrderItemDto) {
-    return this.orderService.addItemToOrder(id, createOrderItemDto);
+  addItemToOrder(@Param('id', ParseIntPipe) id: number, @Body() addItemToOrderDto: AddItemToOrderDto) {
+    return this.orderService.addItemToOrder(id, addItemToOrderDto);
   }
 
   @Post('filter')
