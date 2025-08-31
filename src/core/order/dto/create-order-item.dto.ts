@@ -1,5 +1,13 @@
-import { ArrayNotEmpty, IsArray, IsNumber, IsOptional, Min } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  Min,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { OrderStatusItem } from '../entity/order-item.entity';
 
 export class CreateOrderItemDto {
   @IsNumber({}, { message: 'La cantidad debe ser un número.' })
@@ -10,6 +18,10 @@ export class CreateOrderItemDto {
   @IsOptional()
   @ApiProperty({ example: 'string' })
   comment?: string;
+
+  @IsEnum(OrderStatusItem, { message: 'El estado enviado es incorrecto.' })
+  @ApiProperty({ enum: OrderStatusItem, example: OrderStatusItem.CREADO })
+  status: OrderStatusItem;
 
   @IsNumber({}, { message: 'El ID del plato en sede debe ser un número.' })
   @ApiProperty({ example: 1 })

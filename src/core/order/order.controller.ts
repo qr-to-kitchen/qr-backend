@@ -8,6 +8,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { GetOrdersByFilterDto } from './dto/get-orders-by-filter.dto';
 import { RestoreOrderDto } from './dto/restore-order.dto';
 import { RetrieveOrderDto } from './dto/retrieve-order.dto';
+import { UpdateOrderItemsDto } from './dto/update-order-items.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -79,5 +80,11 @@ export class OrderController {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   updateStatusById(@Param('id', ParseIntPipe) id: number, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.updateStatusById(id, updateOrderDto.status);
+  }
+
+  @Put('items/:id')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  updateItemsStatus(@Param('id', ParseIntPipe) id: number, @Body() updateOrderItemsDto: UpdateOrderItemsDto) {
+    return this.orderService.updateOrderItemsStatus(id, updateOrderItemsDto);
   }
 }

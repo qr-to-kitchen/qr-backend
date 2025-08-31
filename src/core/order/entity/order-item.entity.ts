@@ -3,6 +3,10 @@ import { Order } from './order.entity';
 import { BranchDish } from '../../branches-dishes/branches-dishes.entity';
 import { OrderItemExtra } from './order-item-extra.entity';
 
+export enum OrderStatusItem {
+  CREADO = 'CREADO', COCINANDO = 'COCINANDO', LISTO = 'LISTO', ENTREGADO = 'ENTREGADO'
+}
+
 @Entity()
 export class OrderItem {
   @PrimaryGeneratedColumn()
@@ -16,6 +20,9 @@ export class OrderItem {
 
   @Column({ nullable: true })
   comment: string;
+
+  @Column({ type: 'enum', enum: OrderStatusItem })
+  status: OrderStatusItem;
 
   @ManyToOne(() => Order)
   order: Order;

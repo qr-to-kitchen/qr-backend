@@ -1,8 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order, OrderStatus } from './entity/order.entity';
-import { Between, In, Repository } from 'typeorm';
-import { OrderItem } from './entity/order-item.entity';
+import { Between, DataSource, In, Repository } from 'typeorm';
+import { OrderItem, OrderStatusItem } from './entity/order-item.entity';
 import { Branch } from '../branches/branches.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
@@ -16,6 +19,7 @@ import {
   OrderRestoredDto,
 } from './dto/order-restored.dto';
 import { RetrieveOrderDto } from './dto/retrieve-order.dto';
+import { UpdateOrderItemsDto } from './dto/update-order-items.dto';
 
 @Injectable()
 export class OrderService {
@@ -30,7 +34,8 @@ export class OrderService {
     @InjectRepository(Branch)
     private branchRepository: Repository<Branch>,
     @InjectRepository(ExtraBranchDish)
-    private extraBranchDishRepository: Repository<ExtraBranchDish>
+    private extraBranchDishRepository: Repository<ExtraBranchDish>,
+    private dataSource: DataSource
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -170,7 +175,7 @@ export class OrderService {
   }
 
   async getOrderByFilter(getOrderByFilterDto: GetOrdersByFilterDto) {
-    const statuses = [OrderStatus.ENTREGADO, OrderStatus.CANCELADO];
+    const statuses = [OrderStatus.CERRADO, OrderStatus.CANCELADO];
     const [orders, total] = await this.orderRepository.findAndCount({
       skip: (getOrderByFilterDto.page - 1) * 10,
       take: 10,
@@ -434,11 +439,50 @@ export class OrderService {
       });
     }
 
-    if (status.toString() === OrderStatus.ENTREGADO || status.toString() === OrderStatus.CANCELADO) {
+    if (status.toString() === OrderStatus.CERRADO || status.toString() === OrderStatus.CANCELADO) {
       await this.orderRepository.update(id, { status: status, readyAt: new Date() });
     } else {
       await this.orderRepository.update(id, { status });
     }
+
+    return this.findById(id);
+  }
+
+  async updateOrderItemsStatus(id: number, updateOrderItemsDto: UpdateOrderItemsDto) {
+    await this.dataSource.transaction(async (manager) => {
+      const orderRepo = manager.getRepository(Order);
+      const orderItemRepo = manager.getRepository(OrderItem);
+
+      const order = await orderRepo.findOne({
+        where: { id: id },
+        relations: ['items']
+      });
+      if (!order) {
+        throw new NotFoundException({
+          message: ['Order no encontrada.'],
+          error: "Bad Request",
+          statusCode: 404
+        });
+      }
+
+      for (const item of order.items) {
+        const itemToUpdate = updateOrderItemsDto.items.find(i => i.id === item.id);
+        if (itemToUpdate && itemToUpdate.status !== item.status) {
+          await orderItemRepo.update(item.id, { status: itemToUpdate.status });
+        }
+      }
+
+      const itemStatuses = updateOrderItemsDto.items.map(i => i.status);
+      let newOrderStatus: OrderStatus;
+      if (itemStatuses.includes(OrderStatusItem.CREADO)) {
+        newOrderStatus = OrderStatus.CREADO;
+      } else if (itemStatuses.includes(OrderStatusItem.COCINANDO)) {
+        newOrderStatus = OrderStatus.COCINANDO;
+      } else {
+        newOrderStatus = OrderStatus.LISTO;
+      }
+      await orderRepo.update(id, { status: newOrderStatus });
+    });
 
     return this.findById(id);
   }

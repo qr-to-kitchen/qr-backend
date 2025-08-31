@@ -12,7 +12,7 @@ import { Branch } from '../../branches/branches.entity';
 import { OrderItem } from './order-item.entity';
 
 export enum OrderStatus {
-  CREADO = 'CREADO', COCINANDO = 'COCINANDO', LISTO = 'LISTO', ENTREGADO = 'ENTREGADO', CANCELADO = 'CANCELADO'
+  CREADO = 'CREADO', COCINANDO = 'COCINANDO', LISTO = 'LISTO', CERRADO = 'CERRADO', CANCELADO = 'CANCELADO'
 }
 
 @Entity('orders')
