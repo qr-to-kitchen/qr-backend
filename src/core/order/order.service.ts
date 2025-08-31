@@ -15,6 +15,7 @@ import {
   OrderItemRestoredDto,
   OrderRestoredDto,
 } from './dto/order-restored.dto';
+import { RetrieveOrderDto } from './dto/retrieve-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -384,6 +385,41 @@ export class OrderService {
     }
 
     return { order: orderRestored };
+  }
+
+  async retrieveOrder(retrieveOrderDto: RetrieveOrderDto) {
+    const branch = await this.branchRepository.findOne({
+      where: { id: retrieveOrderDto.branchId, dailyCode: retrieveOrderDto.dailyCode }
+    });
+    if (!branch) {
+      throw new NotFoundException({
+        message: ['Sede no encontrada.'],
+        error: "Bad Request",
+        statusCode: 404
+      });
+    }
+
+    const order = await this.orderRepository.findOne({
+      where: {
+        branch: { id: retrieveOrderDto.branchId },
+        tableNumber: retrieveOrderDto.tableNumber,
+        id: retrieveOrderDto.orderId,
+      },
+      relations: [
+        'branch',
+        'items.branchDish.dish',
+        'items.itemExtras.extraBranchDish.extraBranch.extra'
+      ]
+    });
+    if (!order) {
+      throw new NotFoundException({
+        message: ['Orden no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { order };
   }
 
   async updateStatusById(id: number, status: OrderStatus) {

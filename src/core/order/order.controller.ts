@@ -7,6 +7,7 @@ import { ApiQuery } from '@nestjs/swagger';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { GetOrdersByFilterDto } from './dto/get-orders-by-filter.dto';
 import { RestoreOrderDto } from './dto/restore-order.dto';
+import { RetrieveOrderDto } from './dto/retrieve-order.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -66,6 +67,12 @@ export class OrderController {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   restore(@Body() restoreOrderDto: RestoreOrderDto) {
     return this.orderService.restore(restoreOrderDto);
+  }
+
+  @Post('retrieve')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  retrieveOrder(@Body() retrieveOrderDto: RetrieveOrderDto) {
+    return this.orderService.retrieveOrder(retrieveOrderDto);
   }
 
   @Put(':id')
