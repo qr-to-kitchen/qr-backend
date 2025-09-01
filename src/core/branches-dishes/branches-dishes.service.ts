@@ -51,13 +51,13 @@ export class BranchesDishesService {
 
     const savedBranchDish = await this.branchDishRepository.save(branchDish);
 
-    return { branchDish: savedBranchDish };
+    return this.findById(savedBranchDish.id);
   }
 
   async findByBranchId(branchId: number) {
     const branchesDishes = await this.branchDishRepository.find({
       where: { branch: { id: branchId } },
-      relations: ['dish']
+      relations: ['dish.category']
     });
     if (!branchesDishes.length) {
       throw new NotFoundException({
@@ -123,7 +123,7 @@ export class BranchesDishesService {
   async findById(id: number) {
     const branchDish = await this.branchDishRepository.findOne({
       where: { id },
-      relations: ['dish', 'branch']
+      relations: ['dish.category', 'branch']
     });
     if (!branchDish) {
       throw new NotFoundException({
