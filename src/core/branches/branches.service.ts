@@ -8,6 +8,8 @@ import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 import { CreateBranchUserDto } from './dto/create-branch-user.dto';
 import * as bcrypt from 'bcrypt';
+import { BranchDish } from '../branches-dishes/branches-dishes.entity';
+import { ExtraBranch } from '../extras/entities/extras-branches.entity';
 
 @Injectable()
 export class BranchesService {
@@ -69,10 +71,12 @@ export class BranchesService {
   }
 
   async createBranchWithUser(createBranchUserDto: CreateBranchUserDto) {
-    return await this.dataSource.transaction(async (manager) => {
+    const branchId = await this.dataSource.transaction(async (manager) => {
       const userRepo = manager.getRepository(User);
       const branchRepo = manager.getRepository(Branch);
       const restaurantRepo = manager.getRepository(Restaurant);
+      const branchDishRepo = manager.getRepository(BranchDish);
+      const extraBranchRepo = manager.getRepository(ExtraBranch);
 
       const userExisting = await userRepo.findOne({
         where: [{ email: createBranchUserDto.user.email }, { username: createBranchUserDto.user.username }],
@@ -115,8 +119,51 @@ export class BranchesService {
 
       const savedBranch = await branchRepo.save(branch);
 
-      return { branch: savedBranch }
+      if (createBranchUserDto.branch.sourceBranchId) {
+        const sourceBranchDishes = await branchDishRepo.find({
+          where: { id: createBranchUserDto.branch.sourceBranchId }
+        });
+        if (!sourceBranchDishes.length) {
+          throw new NotFoundException({
+            message: ['Platos en sede no encontrados.'],
+            error: "Not Found",
+            statusCode: 404
+          });
+        }
+
+        for (const sourceBranchDish of sourceBranchDishes) {
+          const newBranchDish = branchDishRepo.create({
+            isAvailable: true,
+            branch: savedBranch,
+            dish: sourceBranchDish.dish
+          });
+          await branchDishRepo.save(newBranchDish);
+        }
+
+        const sourceBranchExtras = await extraBranchRepo.find({
+          where: { id: createBranchUserDto.branch.sourceBranchId }
+        });
+        if (!sourceBranchExtras.length) {
+          throw new NotFoundException({
+            message: ['Extras en sede no encontrados.'],
+            error: "Not Found",
+            statusCode: 404
+          })
+        }
+
+        for (const sourceBranchExtra of sourceBranchExtras) {
+          const newExtraBranch = extraBranchRepo.create({
+            branch: savedBranch,
+            extra: sourceBranchExtra.extra
+          });
+          await extraBranchRepo.save(newExtraBranch);
+        }
+      }
+
+      return savedBranch.id;
     });
+
+    return this.findById(branchId);
   }
 
   async findByUserId(userId: number) {
@@ -138,7 +185,7 @@ export class BranchesService {
   async findByRestaurantId(restaurantId: number) {
     const branches =  await this.branchRepository.find({
       where: { restaurant: { id: restaurantId } },
-      relations: ['restaurant']
+      relations: ['restaurant', 'branchDishes', 'extraBranches']
     });
     if (!branches.length) {
       throw new NotFoundException({
@@ -154,7 +201,7 @@ export class BranchesService {
   async findById(id: number) {
     const branch = await this.branchRepository.findOne({
       where: { id },
-      relations: ['restaurant']
+      relations: ['restaurant', 'branchDishes', 'extraBranches']
     });
     if (!branch) {
       throw new NotFoundException({

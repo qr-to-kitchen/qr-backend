@@ -11,6 +11,7 @@ import {
 import { User } from '../users/entity/users.entity';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
+import { ExtraBranch } from '../extras/entities/extras-branches.entity';
 
 @Entity()
 export class Branch {
@@ -39,9 +40,12 @@ export class Branch {
   @JoinColumn()
   user: User;
 
-  @ManyToOne(() => Restaurant, (restaurant) => restaurant.branches)
+  @ManyToOne(() => Restaurant)
   restaurant: Restaurant;
 
   @OneToMany(() => BranchDish, (branchDish) => branchDish.branch)
   branchDishes: BranchDish[];
+
+  @OneToMany(() => ExtraBranch, (extraBranch) => extraBranch.branch)
+  extraBranches: ExtraBranch[];
 }

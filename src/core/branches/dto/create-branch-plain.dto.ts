@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBranchPlainDto {
@@ -9,4 +9,9 @@ export class CreateBranchPlainDto {
   @IsNumber({}, { message: 'El ID del restaurante debe ser un número.' })
   @ApiProperty({ example: 1 })
   restaurantId: number;
+
+  @IsOptional()
+  @IsNumber({}, { message: 'El ID de la sede de origen debe ser un número.' })
+  @ApiProperty({ example: 1 })
+  sourceBranchId?: number;
 }
