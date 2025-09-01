@@ -173,7 +173,7 @@ export class ExtrasService {
   async findByBranchId(branchId: number) {
     const extraBranches = await this.extraBranchRepository.find({
       where : { branch: { id: branchId } },
-      relations: ['extra', 'branch']
+      relations: ['extra', 'branch', 'extraBranchDishes']
     });
     if (!extraBranches.length) {
       throw new NotFoundException({
