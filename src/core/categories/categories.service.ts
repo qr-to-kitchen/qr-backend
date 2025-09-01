@@ -39,13 +39,13 @@ export class CategoriesService {
 
     const savedCategory = await this.categoryRepository.save(newCategory);
 
-    return { category: savedCategory };
+    return this.findById(savedCategory.id);
   }
 
   async findByRestaurantId(restaurantId: number) {
     const categories = await this.categoryRepository.find({
       where: { restaurant: { id: restaurantId } },
-      relations: ['restaurant']
+      relations: ['restaurant', 'dishes']
     });
     if (!categories.length) {
       throw new NotFoundException({
@@ -61,7 +61,7 @@ export class CategoriesService {
   async findById(id: number) {
     const category =  await this.categoryRepository.findOne({
       where: { id },
-      relations: ['restaurant']
+      relations: ['restaurant', 'dishes']
     });
     if (!category) {
       throw new NotFoundException({
