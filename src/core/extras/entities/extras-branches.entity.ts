@@ -28,7 +28,7 @@ export class ExtraBranch {
   @ManyToOne(() => Branch)
   branch: Branch;
 
-  @ManyToOne(() => Extra, (extra) => extra.extraBranch)
+  @ManyToOne(() => Extra, (extra) => extra.extraBranches)
   extra: Extra;
 
   @OneToMany(() => ExtraBranchDish, extraBranchDishes => extraBranchDishes.extraBranch)

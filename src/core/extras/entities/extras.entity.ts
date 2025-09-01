@@ -34,5 +34,5 @@ export class Extra {
   restaurant: Restaurant;
 
   @OneToMany(() => ExtraBranch, extraBranch => extraBranch.extra)
-  extraBranch: ExtraBranch[];
+  extraBranches: ExtraBranch[];
 }
