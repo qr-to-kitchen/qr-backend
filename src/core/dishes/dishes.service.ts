@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Dish } from './dishes.entity';
 import { Restaurant } from '../restaurants/restaurants.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { ImagesService } from '../images/images.service';
 import { Category } from '../categories/categories.entity';
+import { Branch } from '../branches/branches.entity';
+import { BranchDish } from '../branches-dishes/branches-dishes.entity';
 
 @Injectable()
 export class DishesService {
@@ -18,7 +20,8 @@ export class DishesService {
     private restaurantRepository: Repository<Restaurant>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
-    private readonly imagesService: ImagesService
+    private readonly imagesService: ImagesService,
+    private dataSource: DataSource
   ) {}
 
   async create(createDishDto: CreateDishDto, file: Express.Multer.File) {
@@ -56,6 +59,26 @@ export class DishesService {
     });
 
     const savedDish = await this.dishRepository.save(dish);
+
+    if (createDishDto.saveInAllBranches) {
+      await this.dataSource.transaction(async (manager) => {
+        const branchRepo = manager.getRepository(Branch);
+        const branchDishRepo = manager.getRepository(BranchDish);
+
+        const branches = await branchRepo.find({
+          where: { restaurant: { id: restaurant.id } }
+        });
+        for (const branch of branches) {
+          const branchDish = branchDishRepo.create({
+            isAvailable: true,
+            branch: branch,
+            dish: savedDish
+          });
+
+          await branchDishRepo.save(branchDish);
+        }
+      });
+    }
 
     return { dish: savedDish };
   }

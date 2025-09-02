@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -26,6 +26,11 @@ export class CreateDishDto {
   @IsNumber({}, { message: 'El ID de la categoría debe ser un número.' })
   @ApiProperty({ example: 1 })
   categoryId: number;
+
+  @Type(() => Boolean)
+  @IsBoolean({ message: 'Este campo debe ser verdadero o falso.' })
+  @ApiProperty({ example: true })
+  saveInAllBranches: boolean;
 
   @ApiProperty({ type: 'string', format: 'binary' })
   file: Express.Multer.File;

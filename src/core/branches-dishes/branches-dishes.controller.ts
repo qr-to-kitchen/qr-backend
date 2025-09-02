@@ -13,6 +13,7 @@ import {
 import { BranchesDishesService } from './branches-dishes.service';
 import { CreateBranchDishDto } from './dto/create-branch-dish.dto';
 import { UpdateBranchDishDto } from './dto/update-branch-dish.dto';
+import { BulkSaveBranchDishes } from './dto/bulk-save-branch-dishes';
 
 @Controller('branches-dishes')
 export class BranchesDishesController {
@@ -48,6 +49,12 @@ export class BranchesDishesController {
   @Get(':id')
   getBranchDishById(@Param('id', ParseIntPipe) id: number) {
     return this.branchesDishesService.findById(id);
+  }
+
+  @Post('bulk-save')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  bulkSave(@Body() bulkSaveBranchDishes: BulkSaveBranchDishes) {
+    return this.branchesDishesService.bulkSave(bulkSaveBranchDishes);
   }
 
   @Put(':id')

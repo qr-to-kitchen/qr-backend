@@ -2,10 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Branch } from '../branches/branches.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BranchDish } from './branches-dishes.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Dish } from '../dishes/dishes.entity';
 import { CreateBranchDishDto } from './dto/create-branch-dish.dto';
 import { UpdateBranchDishDto } from './dto/update-branch-dish.dto';
+import { BulkSaveBranchDishes } from './dto/bulk-save-branch-dishes';
 
 @Injectable()
 export class BranchesDishesService {
@@ -16,7 +17,8 @@ export class BranchesDishesService {
     @InjectRepository(Dish)
     private dishRepository: Repository<Dish>,
     @InjectRepository(Branch)
-    private branchRepository: Repository<Branch>
+    private branchRepository: Repository<Branch>,
+    private dataSource: DataSource
   ) {}
 
   async create(createBranchDishDto: CreateBranchDishDto) {
@@ -134,6 +136,101 @@ export class BranchesDishesService {
     }
 
     return { branchDish };
+  }
+
+  async bulkSave(bulkSaveBranchDishes: BulkSaveBranchDishes) {
+    return await this.dataSource.transaction(async (manager) => {
+      const branchDishRepo = manager.getRepository(BranchDish);
+      const branchRepo = manager.getRepository(Branch);
+      const dishRepo = manager.getRepository(Dish);
+
+      const branchesDishes: BranchDish[] = [];
+
+      for (const createOrUpdateBranchDish of bulkSaveBranchDishes.branchDishes) {
+        if (createOrUpdateBranchDish.id) {
+          const updateBranchDishDto: UpdateBranchDishDto = {
+            customPrice: createOrUpdateBranchDish.customPrice,
+            isAvailable: createOrUpdateBranchDish.isAvailable
+          }
+
+          const branchDish = await branchDishRepo.findOneBy({
+            id: createOrUpdateBranchDish.id
+          });
+          if (!branchDish) {
+            throw new NotFoundException({
+              message: ['Plato en sede no encontrado.'],
+              error: 'Not Found',
+              statusCode: 404
+            });
+          }
+
+          await branchDishRepo.update(branchDish.id, updateBranchDishDto);
+
+          const updatedBranchDish = await branchDishRepo.findOne({
+            where: { id: branchDish.id },
+            relations: ['dish', 'branch']
+          });
+          if (!updatedBranchDish) {
+            throw new NotFoundException({
+              message: ['Plato en sede no encontrado.'],
+              error: 'Not Found',
+              statusCode: 404
+            });
+          }
+
+          branchesDishes.push(updatedBranchDish);
+        } else {
+          if (createOrUpdateBranchDish.branchId && createOrUpdateBranchDish.dishId && createOrUpdateBranchDish.isAvailable !== undefined) {
+            const createBranchDishDto: CreateBranchDishDto = {
+              customPrice: createOrUpdateBranchDish.customPrice,
+              isAvailable: createOrUpdateBranchDish.isAvailable,
+              branchId: createOrUpdateBranchDish.branchId,
+              dishId: createOrUpdateBranchDish.dishId
+            }
+
+            const branch = await branchRepo.findOne({
+              where: { id: createBranchDishDto.branchId }
+            });
+            if (!branch) {
+              throw new NotFoundException({
+                message: ['Sede no encontrada.'],
+                error: "Bad Request",
+                statusCode: 404
+              });
+            }
+
+            const dish = await dishRepo.findOne({
+              where: { id: createBranchDishDto.dishId }
+            });
+            if (!dish) {
+              throw new NotFoundException({
+                message: ['Plato no encontrado.'],
+                error: "Bad Request",
+                statusCode: 404
+              });
+            }
+
+            const branchDish = branchDishRepo.create({
+              customPrice: createBranchDishDto.customPrice,
+              isAvailable: createBranchDishDto.isAvailable,
+              branch: branch,
+              dish: dish
+            });
+            const savedBranchDish = await branchDishRepo.save(branchDish);
+
+            branchesDishes.push(savedBranchDish);
+          } else {
+            throw new NotFoundException({
+              message: ['Datos incorrectos.'],
+              error: 'Bad Request',
+              statusCode: 400
+            });
+          }
+        }
+      }
+
+      return { branchesDishes };
+    });
   }
 
   async updateById(id: number, updateBranchDishDto: UpdateBranchDishDto) {
