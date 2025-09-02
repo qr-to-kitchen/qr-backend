@@ -125,7 +125,7 @@ export class ExtrasService {
   async findById(id: number) {
     const extra = await this.extraRepository.findOne({
       where: { id },
-      relations: ['restaurant', 'extraBranches']
+      relations: ['restaurant', 'extraBranches.branch']
     });
     if (!extra) {
       throw new NotFoundException({
@@ -157,7 +157,7 @@ export class ExtrasService {
   async findByRestaurantId(restaurantId: number) {
     const extras = await this.extraRepository.find({
       where : { restaurant: { id: restaurantId } },
-      relations: ['restaurant', 'extraBranches']
+      relations: ['restaurant', 'extraBranches.branch']
     });
     if (!extras.length) {
       throw new NotFoundException({
