@@ -162,7 +162,7 @@ export class ExtrasService {
   async findExtraBranchDishById(id: number) {
     const extraBranchDish = await this.extraBranchDishRepository.findOne({
       where: { id },
-      relations: ['extraBranch', 'branchDish', 'branchDish.dish']
+      relations: ['extraBranch.extra', 'branchDish', 'branchDish.dish']
     });
     if (!extraBranchDish) {
       throw new NotFoundException({
@@ -226,7 +226,7 @@ export class ExtrasService {
   async findByExtraBranchIdAndBranchDishId(extraBranchId: number, branchDishId: number) {
     const extraBranchDish = await this.extraBranchDishRepository.findOne({
       where: { extraBranch: { id: extraBranchId }, branchDish: { id: branchDishId } },
-      relations: ['extraBranch', 'branchDish', 'branchDish.dish']
+      relations: ['extraBranch.extra', 'branchDish', 'branchDish.dish']
     });
     if (!extraBranchDish) {
       throw new NotFoundException({
@@ -319,7 +319,7 @@ export class ExtrasService {
 
           const updatedExtraBranchDish = await extraBranchDishRepo.findOne({
             where: { id: extraBranchDish.id },
-            relations: ['extraBranch', 'branchDish', 'branchDish.dish']
+            relations: ['extraBranch.extra', 'branchDish', 'branchDish.dish']
           });
           if (!updatedExtraBranchDish) {
             throw new NotFoundException({
