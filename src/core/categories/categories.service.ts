@@ -34,6 +34,7 @@ export class CategoriesService {
     const newCategory = this.categoryRepository.create({
       name: createCategoryDto.name,
       displayOrder: createCategoryDto.displayOrder,
+      visible: createCategoryDto.visible,
       restaurant: restaurant
     });
 

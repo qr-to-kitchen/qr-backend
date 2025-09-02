@@ -22,6 +22,9 @@ export class Category {
   @Column()
   displayOrder: number;
 
+  @Column()
+  visible: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
