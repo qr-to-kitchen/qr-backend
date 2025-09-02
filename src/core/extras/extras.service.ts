@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ExtraBranchDish } from './entities/extras-branch-dish.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Extra } from './entities/extras.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Not, Repository } from 'typeorm';
 import { CreateExtraDto } from './dto/create-extra.dto';
 import { Branch } from '../branches/branches.entity';
 import { CreateExtraBranchDishDto } from './dto/create-extra-branch-dish.dto';
@@ -13,6 +13,7 @@ import { ExtraBranch } from './entities/extras-branches.entity';
 import { CreateExtraBranchDto } from './dto/create-extra-branch.dto';
 import { UpdateExtraBranchDishDto } from './dto/update-extra-branch-dish.dto';
 import { BulkSaveExtraBranchDishes } from './dto/bulk-save-extra-branch-dishes';
+import { BulkSaveExtraBranches } from './dto/bulk-save-extra-branches';
 
 @Injectable()
 export class ExtrasService {
@@ -207,6 +208,28 @@ export class ExtrasService {
     return { extraBranches };
   }
 
+  async findByRestaurantIdAndNotBranchId(restaurantId: number, branchId: number) {
+    const extraBranches = await this.extraBranchRepository.find({
+      where: { branch: { id: branchId } },
+      relations: ['extra']
+    });
+    if (!extraBranches.length) {
+      throw new NotFoundException({
+        message: ['Extras en sede no encontrados.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    const extraIdsInBranch = extraBranches.map(eb => eb.extra.id);
+
+    const extrasNotInBranch = await this.extraRepository.find({
+      where: { restaurant: { id: restaurantId }, id: Not(In(extraIdsInBranch)) }
+    });
+
+    return { extras: extrasNotInBranch };
+  }
+
   async findByExtraIdAndBranchId(extraId: number, branchId: number) {
     const extraBranch = await this.extraBranchRepository.findOne({
       where: { extra: { id: extraId }, branch: { id: branchId } },
@@ -307,7 +330,7 @@ export class ExtrasService {
           const extraBranchDish = await extraBranchDishRepo.findOneBy({
             id: createOrUpdateExtraBranchDish.id
           });
-          if(!extraBranchDish) {
+          if (!extraBranchDish) {
             throw new NotFoundException({
               message: ['Extra en plato en sede no encontrado.'],
               error: 'Not Found',
@@ -382,6 +405,52 @@ export class ExtrasService {
       }
 
       return { extraBranchDishes };
+    });
+  }
+
+  async bulkSaveExtraBranch(bulkSaveExtraBranchDishes: BulkSaveExtraBranches) {
+    return await this.dataSource.transaction(async (manager) => {
+      const extraBranchRepo = manager.getRepository(ExtraBranch);
+      const extraRepo = manager.getRepository(Extra);
+      const branchRepo = manager.getRepository(Branch);
+
+      const extraBranches: ExtraBranch[] = [];
+
+      for (const createExtraBranch of bulkSaveExtraBranchDishes.extraBranches) {
+        if (createExtraBranch.extraId && createExtraBranch.branchId) {
+          const extra = await extraRepo.findOneBy({
+            id: createExtraBranch.extraId
+          });
+          if (!extra) {
+            throw new NotFoundException({
+              message: ['Extra no encontrado.'],
+              error: 'Not Found',
+              statusCode: 404
+            });
+          }
+
+          const branch = await branchRepo.findOneBy({
+            id: createExtraBranch.branchId
+          });
+          if (!branch) {
+            throw new NotFoundException({
+              message: ['Sede no encontrada.'],
+              error: 'Not Found',
+              statusCode: 404
+            });
+          }
+
+          const extraBranch = extraBranchRepo.create({
+            extra: extra,
+            branch: branch
+          });
+          const savedExtraBranch = await extraBranchRepo.save(extraBranch);
+
+          extraBranches.push(savedExtraBranch);
+        }
+      }
+
+      return { extraBranches };
     });
   }
 

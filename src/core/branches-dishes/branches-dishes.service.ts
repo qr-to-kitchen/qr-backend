@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Branch } from '../branches/branches.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BranchDish } from './branches-dishes.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Not, Repository } from 'typeorm';
 import { Dish } from '../dishes/dishes.entity';
 import { CreateBranchDishDto } from './dto/create-branch-dish.dto';
 import { UpdateBranchDishDto } from './dto/update-branch-dish.dto';
@@ -72,8 +72,6 @@ export class BranchesDishesService {
     return { branchesDishes };
   }
 
-
-
   async findByBranchIdAndCategoryId(branchId: number, categoryId: number) {
     const branchesDishes = await this.branchDishRepository.find({
       where: { branch: { id: branchId }, dish: { category: { id: categoryId } }, isAvailable: true },
@@ -104,6 +102,28 @@ export class BranchesDishesService {
     }
 
     return { branchesDishes };
+  }
+
+  async findByRestaurantIdAndNotBranchId(restaurantId: number, branchId: number) {
+    const branchDishes = await this.branchDishRepository.find({
+      where: { branch: { id: branchId } },
+      relations: ['dish']
+    });
+    if (!branchDishes.length) {
+      throw new NotFoundException({
+        message: ['Platos en sede no encontrados.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    const dishIdsInBranch = branchDishes.map(bd => bd.dish.id);
+
+    const dishesNotInBranch = await this.dishRepository.find({
+      where: { restaurant: { id: restaurantId }, id: Not(In(dishIdsInBranch)) }
+    });
+
+    return { dishes: dishesNotInBranch };
   }
 
   async findByBranchIdAndDishId(branchId: number, dishId: number) {
