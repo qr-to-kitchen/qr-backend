@@ -16,6 +16,7 @@ import { CreateExtraBranchDishDto } from './dto/create-extra-branch-dish.dto';
 import { UpdateExtraDto } from './dto/update-extra.dto';
 import { CreateExtraBranchDto } from './dto/create-extra-branch.dto';
 import { UpdateExtraBranchDishDto } from './dto/update-extra-branch-dish.dto';
+import { BulkSaveExtraBranchDishes } from './dto/bulk-save-extra-branch-dishes';
 
 @Controller('extras')
 export class ExtrasController {
@@ -63,6 +64,12 @@ export class ExtrasController {
   @Get('extraBranchDish/branchDish/:id')
   getExtraBranchDishByBranchId(@Param('id', ParseIntPipe) id: number) {
     return this.extrasService.findByBranchDishId(id);
+  }
+
+  @Post('bulk-save')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  bulkSave(@Body() bulkSaveExtraBranchDishes: BulkSaveExtraBranchDishes) {
+    return this.extrasService.bulkSave(bulkSaveExtraBranchDishes);
   }
 
   @Put(':id')

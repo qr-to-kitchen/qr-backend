@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -16,4 +16,9 @@ export class CreateExtraDto {
   @Min(0, { message: 'El precio base no puede ser negativo.' })
   @ApiProperty({ example: 10 })
   basePrice: number;
+
+  @Type(() => Boolean)
+  @IsBoolean({ message: 'Este campo debe ser verdadero o falso.' })
+  @ApiProperty({ example: true })
+  saveInAllBranches: boolean;
 }
