@@ -1,9 +1,11 @@
 import {
-  ConnectedSocket, MessageBody,
+  ConnectedSocket,
+  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
@@ -11,6 +13,9 @@ import { Socket } from 'socket.io';
   }
 })
 export class SocketGateway {
+  @WebSocketServer()
+  server: Server;
+
   @SubscribeMessage('joinBranchRoom')
   joinBranchRoom(@ConnectedSocket() client: Socket, @MessageBody() branchId: string) {
     client.join(`branch-${branchId}`);

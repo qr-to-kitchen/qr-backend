@@ -5,12 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BranchDish } from './branches-dishes.entity';
 import { Branch } from '../branches/branches.entity';
 import { Dish } from '../dishes/dishes.entity';
+import { SocketGateway } from '../../socket/socket.gateway';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([BranchDish, Branch, Dish]),
   ],
   controllers: [BranchesDishesController],
-  providers: [BranchesDishesService]
+  providers: [BranchesDishesService, SocketGateway]
 })
 export class BranchesDishesModule {}

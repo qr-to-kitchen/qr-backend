@@ -7,6 +7,7 @@ import { Dish } from '../dishes/dishes.entity';
 import { CreateBranchDishDto } from './dto/create-branch-dish.dto';
 import { UpdateBranchDishDto } from './dto/update-branch-dish.dto';
 import { BulkSaveBranchDishes } from './dto/bulk-save-branch-dishes';
+import { SocketGateway } from '../../socket/socket.gateway';
 
 @Injectable()
 export class BranchesDishesService {
@@ -18,7 +19,8 @@ export class BranchesDishesService {
     private dishRepository: Repository<Dish>,
     @InjectRepository(Branch)
     private branchRepository: Repository<Branch>,
-    private dataSource: DataSource
+    private dataSource: DataSource,
+    private socketGateway: SocketGateway
   ) {}
 
   async create(createBranchDishDto: CreateBranchDishDto) {
@@ -199,6 +201,10 @@ export class BranchesDishesService {
           }
 
           branchesDishes.push(updatedBranchDish);
+          this.socketGateway.server.to(bulkSaveBranchDishes.socketId).emit('small-snackbar-updates', {
+            current: branchesDishes.length,
+            total: bulkSaveBranchDishes.branchDishes.length
+          });
         } else {
           if (createOrUpdateBranchDish.branchId && createOrUpdateBranchDish.dishId && createOrUpdateBranchDish.isAvailable !== undefined) {
             const createBranchDishDto: CreateBranchDishDto = {
@@ -239,6 +245,10 @@ export class BranchesDishesService {
             const savedBranchDish = await branchDishRepo.save(branchDish);
 
             branchesDishes.push(savedBranchDish);
+            this.socketGateway.server.to(bulkSaveBranchDishes.socketId).emit('small-snackbar-updates', {
+              current: branchesDishes.length,
+              total: bulkSaveBranchDishes.branchDishes.length
+            });
           } else {
             throw new NotFoundException({
               message: ['Datos incorrectos.'],
