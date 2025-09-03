@@ -8,12 +8,13 @@ import { Branch } from '../branches/branches.entity';
 import { BranchDish } from '../branches-dishes/branches-dishes.entity';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { ExtraBranch } from './entities/extras-branches.entity';
+import { SocketGateway } from '../../socket/socket.gateway';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Extra, ExtraBranch, ExtraBranchDish, Restaurant, Branch, BranchDish])
   ],
   controllers: [ExtrasController],
-  providers: [ExtrasService]
+  providers: [ExtrasService, SocketGateway]
 })
 export class ExtrasModule {}

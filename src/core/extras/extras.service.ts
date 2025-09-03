@@ -14,6 +14,7 @@ import { CreateExtraBranchDto } from './dto/create-extra-branch.dto';
 import { UpdateExtraBranchDishDto } from './dto/update-extra-branch-dish.dto';
 import { BulkSaveExtraBranchDishes } from './dto/bulk-save-extra-branch-dishes';
 import { BulkSaveExtraBranches } from './dto/bulk-save-extra-branches';
+import { SocketGateway } from '../../socket/socket.gateway';
 
 @Injectable()
 export class ExtrasService {
@@ -32,6 +33,7 @@ export class ExtrasService {
     @InjectRepository(BranchDish)
     private branchDishRepository: Repository<BranchDish>,
     private dataSource: DataSource,
+    private socketGateway: SocketGateway
   ) {}
 
   async createExtra(createExtraDto: CreateExtraDto) {
@@ -353,6 +355,10 @@ export class ExtrasService {
           }
 
           extraBranchDishes.push(updatedExtraBranchDish);
+          this.socketGateway.server.to(bulkSaveExtraBranchDishes.socketId).emit('small-snackbar-updates', {
+            current: extraBranchDishes.length,
+            total: bulkSaveExtraBranchDishes.extraBranchDishes.length
+          });
         } else {
           if (createOrUpdateExtraBranchDish.extraBranchId && createOrUpdateExtraBranchDish.branchDishId && createOrUpdateExtraBranchDish.isAvailable !== undefined) {
             const createExtraBranchDishDto: CreateExtraBranchDishDto = {
@@ -362,8 +368,9 @@ export class ExtrasService {
               branchDishId: createOrUpdateExtraBranchDish.branchDishId
             }
 
-            const extraBranch = await extraBranchRepo.findOneBy({
-              id: createExtraBranchDishDto.extraBranchId
+            const extraBranch = await extraBranchRepo.findOne({
+              where: { id: createExtraBranchDishDto.extraBranchId },
+              relations: ['extra']
             });
             if (!extraBranch) {
               throw new NotFoundException({
@@ -394,6 +401,10 @@ export class ExtrasService {
             const savedExtraBranchDish = await extraBranchDishRepo.save(extraBranchDish);
 
             extraBranchDishes.push(savedExtraBranchDish);
+            this.socketGateway.server.to(bulkSaveExtraBranchDishes.socketId).emit('small-snackbar-updates', {
+              current: extraBranchDishes.length,
+              total: bulkSaveExtraBranchDishes.extraBranchDishes.length
+            });
           } else {
             throw new NotFoundException({
               message: ['Datos incorrectos.'],
@@ -408,7 +419,7 @@ export class ExtrasService {
     });
   }
 
-  async bulkSaveExtraBranch(bulkSaveExtraBranchDishes: BulkSaveExtraBranches) {
+  async bulkSaveExtraBranch(bulkSaveExtraBranches: BulkSaveExtraBranches) {
     return await this.dataSource.transaction(async (manager) => {
       const extraBranchRepo = manager.getRepository(ExtraBranch);
       const extraRepo = manager.getRepository(Extra);
@@ -416,7 +427,7 @@ export class ExtrasService {
 
       const extraBranches: ExtraBranch[] = [];
 
-      for (const createExtraBranch of bulkSaveExtraBranchDishes.extraBranches) {
+      for (const createExtraBranch of bulkSaveExtraBranches.extraBranches) {
         if (createExtraBranch.extraId && createExtraBranch.branchId) {
           const extra = await extraRepo.findOneBy({
             id: createExtraBranch.extraId
@@ -447,6 +458,10 @@ export class ExtrasService {
           const savedExtraBranch = await extraBranchRepo.save(extraBranch);
 
           extraBranches.push(savedExtraBranch);
+          this.socketGateway.server.to(bulkSaveExtraBranches.socketId).emit('small-snackbar-updates', {
+            current: extraBranches.length,
+            total: bulkSaveExtraBranches.extraBranches.length
+          });
         }
       }
 

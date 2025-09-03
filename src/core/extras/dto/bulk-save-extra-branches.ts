@@ -1,6 +1,7 @@
 import {
   ArrayNotEmpty,
   IsArray,
+  IsNotEmpty,
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -19,4 +20,8 @@ export class BulkSaveExtraBranches {
     ]
   })
   extraBranches: CreateExtraBranchDto[];
+
+  @IsNotEmpty({ message: 'El id del socket es obligatorio.'})
+  @ApiProperty({ example: 'string' })
+  socketId: string;
 }
