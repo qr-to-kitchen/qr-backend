@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -27,32 +28,41 @@ export class BranchesDishesController {
   }
 
   @Get('branch/:id')
-  getBranchDishByBranchId(@Param('id', ParseIntPipe) id: number) {
+  getBranchDishByBranchId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesDishesService.findByBranchId(id);
   }
 
   @Get('branch/:branchId/category/:categoryId')
-  getBranchDishByBranchIdAndCategoryId(@Param('branchId', ParseIntPipe) branchId: number, @Param('categoryId', ParseIntPipe) categoryId: number) {
+  getBranchDishByBranchIdAndCategoryId(
+    @Param('branchId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) branchId: number,
+    @Param('categoryId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) categoryId: number
+  ) {
     return this.branchesDishesService.findByBranchIdAndCategoryId(branchId, categoryId);
   }
 
   @Get('dish/:id')
-  getBranchDishByDishId(@Param('id', ParseIntPipe) id: number) {
+  getBranchDishByDishId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesDishesService.findByDishId(id);
   }
 
   @Get('restaurant/:restaurantId/no-branch/:branchId')
-  getExtraByRestaurantIdAndNotBranchId(@Param('restaurantId', ParseIntPipe) restaurantId: number, @Param('branchId', ParseIntPipe) branchId: number) {
+  getExtraByRestaurantIdAndNotBranchId(
+    @Param('restaurantId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) restaurantId: number,
+    @Param('branchId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) branchId: number
+  ) {
     return this.branchesDishesService.findByRestaurantIdAndNotBranchId(restaurantId, branchId);
   }
 
-  @Get('branch/:id/dish/:id2')
-  getBranchDishByBranchIdAndDishId(@Param('id', ParseIntPipe) id: number, @Param('id2', ParseIntPipe) id2: number) {
-    return this.branchesDishesService.findByBranchIdAndDishId(id, id2);
+  @Get('branch/:branchId/dish/:dishId')
+  getBranchDishByBranchIdAndDishId(
+    @Param('branchId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) branchId: number,
+    @Param('dishId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) dishId: number
+  ) {
+    return this.branchesDishesService.findByBranchIdAndDishId(branchId, dishId);
   }
 
   @Get(':id')
-  getBranchDishById(@Param('id', ParseIntPipe) id: number) {
+  getBranchDishById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesDishesService.findById(id);
   }
 
@@ -64,12 +74,12 @@ export class BranchesDishesController {
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateById(@Param('id', ParseIntPipe) id: number, @Body() updateBranchDishDto: UpdateBranchDishDto) {
+  updateById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() updateBranchDishDto: UpdateBranchDishDto) {
     return this.branchesDishesService.updateById(id, updateBranchDishDto);
   }
 
   @Delete(':id')
-  deleteById(@Param('id', ParseIntPipe) id: number) {
+  deleteById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesDishesService.deleteById(id);
   }
 }

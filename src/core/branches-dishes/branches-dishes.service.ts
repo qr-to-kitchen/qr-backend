@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Branch } from '../branches/branches.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BranchDish } from './branches-dishes.entity';
@@ -28,10 +32,10 @@ export class BranchesDishesService {
       where: { id: createBranchDishDto.branchId }
     });
     if (!branch) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Sede no encontrada.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -39,10 +43,10 @@ export class BranchesDishesService {
       where: { id: createBranchDishDto.dishId }
     });
     if (!dish) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Plato no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -218,10 +222,10 @@ export class BranchesDishesService {
               where: { id: createBranchDishDto.branchId }
             });
             if (!branch) {
-              throw new NotFoundException({
+              throw new BadRequestException({
                 message: ['Sede no encontrada.'],
                 error: "Bad Request",
-                statusCode: 404
+                statusCode: 400
               });
             }
 
@@ -229,10 +233,10 @@ export class BranchesDishesService {
               where: { id: createBranchDishDto.dishId }
             });
             if (!dish) {
-              throw new NotFoundException({
+              throw new BadRequestException({
                 message: ['Plato no encontrado.'],
                 error: "Bad Request",
-                statusCode: 404
+                statusCode: 400
               });
             }
 
@@ -250,7 +254,7 @@ export class BranchesDishesService {
               total: bulkSaveBranchDishes.branchDishes.length
             });
           } else {
-            throw new NotFoundException({
+            throw new BadRequestException({
               message: ['Datos incorrectos.'],
               error: 'Bad Request',
               statusCode: 400
