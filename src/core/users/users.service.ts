@@ -106,6 +106,17 @@ export class UsersService {
     return { user };
   }
 
+  async findByIdToValidateToken(id: number) {
+    const user = await this.userRepository.findOneBy({
+      id
+    });
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return { user };
+  }
+
   async getAll() {
     const users = await this.userRepository.find();
     if (!users.length) {

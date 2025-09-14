@@ -1,10 +1,13 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
-  Param, ParseIntPipe,
-  Post, Put,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
   Request,
   UseGuards,
   UsePipes,
@@ -45,7 +48,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  getById(@Param('id', ParseIntPipe) id: number) {
+  getById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.usersService.findById(id);
   }
 
@@ -56,12 +59,12 @@ export class UsersController {
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateById(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
+  updateById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateById(id, updateUserDto);
   }
 
   @Delete(':id')
-  deleteById(@Param('id', ParseIntPipe) id: number) {
+  deleteById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.usersService.deleteById(id);
   }
 

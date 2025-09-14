@@ -7,12 +7,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from '../../security/jwt.strategy';
 import { MailService } from '../../mail/mail.service';
 import { VerificationCode } from './entity/verification-code.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
     TypeOrmModule.forFeature([User, VerificationCode]),
     JwtModule.register({
-      secret: 'Secret_Key_Qr_Kitchen_Back_022506',
+      secret: process.env.JWT_SECRET ?? 'Secret_Key_Qr_Kitchen_Back_022506',
       signOptions: { expiresIn: '1w' }
     })
   ],
