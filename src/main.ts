@@ -12,21 +12,30 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  const config = new DocumentBuilder()
+  const builder = new DocumentBuilder()
     .setTitle('Qr-Backend')
     .addBearerAuth(
       {
         type: 'http',
       },
       'jwt-auth'
-    )
-    .addServer(process.env.NODE_ENV === 'production' ? '/qr' : '/')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
+    );
+
+  if (process.env.NODE_ENV === 'production') {
+    builder
+      .addServer('qr', 'Prod-dominio')
+      .addServer('/', 'Dev Prod-ip');
+  } else {
+    builder
+      .addServer('/', 'Dev Prod-ip')
+      .addServer('qr', 'Prod-dominio');
+  }
+
+  const document = SwaggerModule.createDocument(app, builder.build());
   SwaggerModule.setup('api', app, document);
 
   app.enableCors();
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+bootstrap().then();

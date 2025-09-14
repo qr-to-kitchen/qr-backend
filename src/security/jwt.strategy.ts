@@ -11,12 +11,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'Secret_Key_Qr_Kitchen_Back_022506'
+      secretOrKey: process.env.JWT_SECRET ?? 'Secret_Key_Qr_Kitchen_Back_022506'
     });
   }
 
   async validate(payload: any) {
-    const userResponse = await this.userService.findById(payload.sub);
+    const userResponse = await this.userService.findByIdToValidateToken(payload.sub);
 
     if (payload.tokenVersion !== userResponse.user.tokenVersion) {
       throw new UnauthorizedException('Token inválido debido a cambio de contraseña');
