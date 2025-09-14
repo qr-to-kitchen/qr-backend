@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -43,32 +44,41 @@ export class ExtrasController {
   }
 
   @Get('restaurant/:id')
-  getExtraByRestaurantId(@Param('id', ParseIntPipe) id: number) {
+  getExtraByRestaurantId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.extrasService.findByRestaurantId(id);
   }
 
   @Get('restaurant/:restaurantId/no-branch/:branchId')
-  getExtraByRestaurantIdAndNotBranchId(@Param('restaurantId', ParseIntPipe) restaurantId: number, @Param('branchId', ParseIntPipe) branchId: number) {
+  getExtraByRestaurantIdAndNotBranchId(
+    @Param('restaurantId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) restaurantId: number,
+    @Param('branchId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) branchId: number
+  ) {
     return this.extrasService.findByRestaurantIdAndNotBranchId(restaurantId, branchId);
   }
 
   @Get('extraBranch/branch/:id')
-  getExtraBranchByBranchId(@Param('id', ParseIntPipe) id: number) {
+  getExtraBranchByBranchId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.extrasService.findByBranchId(id);
   }
 
   @Get('extra/:extraId/branch/:branchId')
-  getExtraBranchByExtraIdAndBranchId(@Param('extraId', ParseIntPipe) extraId: number, @Param('branchId', ParseIntPipe) branchId: number) {
+  getExtraBranchByExtraIdAndBranchId(
+    @Param('extraId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) extraId: number,
+    @Param('branchId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) branchId: number
+  ) {
     return this.extrasService.findByExtraIdAndBranchId(extraId, branchId);
   }
 
   @Get('extraBranch/:extraBranchId/branchDish/:branchDishId')
-  getExtraBranchDishByExtraBranchIdAndBranchDishId(@Param('extraBranchId', ParseIntPipe) extraBranchId: number, @Param('branchDishId', ParseIntPipe) branchDishId: number) {
+  getExtraBranchDishByExtraBranchIdAndBranchDishId(
+    @Param('extraBranchId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) extraBranchId: number,
+    @Param('branchDishId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) branchDishId: number
+  ) {
     return this.extrasService.findByExtraBranchIdAndBranchDishId(extraBranchId, branchDishId);
   }
 
   @Get('extraBranchDish/branchDish/:id')
-  getExtraBranchDishByBranchId(@Param('id', ParseIntPipe) id: number) {
+  getExtraBranchDishByBranchId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.extrasService.findByBranchDishId(id);
   }
 
@@ -86,23 +96,23 @@ export class ExtrasController {
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateExtraById(@Param('id', ParseIntPipe) id: number, @Body() updateExtraDto: UpdateExtraDto) {
+  updateExtraById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() updateExtraDto: UpdateExtraDto) {
     return this.extrasService.updateExtraById(id, updateExtraDto);
   }
 
   @Put('branch-dish/:id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateExtraBranchDishById(@Param('id', ParseIntPipe) id: number, @Body() updateExtraBranchDishDto: UpdateExtraBranchDishDto) {
+  updateExtraBranchDishById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() updateExtraBranchDishDto: UpdateExtraBranchDishDto) {
     return this.extrasService.updateExtraBranchDishById(id, updateExtraBranchDishDto);
   }
 
   @Delete(':id')
-  deleteExtraById(@Param('id', ParseIntPipe) id: number) {
+  deleteExtraById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.extrasService.deleteExtraById(id);
   }
 
   @Delete('branch-dish/:id')
-  deleteExtraBranchDishById(@Param('id', ParseIntPipe) id: number) {
+  deleteExtraBranchDishById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.extrasService.deleteExtraBranchDishById(id);
   }
 }

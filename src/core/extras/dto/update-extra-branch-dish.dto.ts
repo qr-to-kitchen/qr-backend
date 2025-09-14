@@ -6,6 +6,7 @@ export class UpdateExtraBranchDishDto {
   @IsOptional()
   @IsBoolean({ message: 'Este campo debe ser verdadero o falso.' })
   @ApiProperty({ example: true })
+  @Type(() => Boolean)
   isAvailable?: boolean;
 
   @IsOptional()

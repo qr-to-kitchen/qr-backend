@@ -6,6 +6,7 @@ export class CreateOrUpdateExtraBranchDishDto {
   @IsOptional()
   @IsNumber({}, { message: 'El ID de extra en plato en sede debe ser un número.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   id?: number;
 
   @IsOptional()
@@ -18,15 +19,18 @@ export class CreateOrUpdateExtraBranchDishDto {
   @IsOptional()
   @IsBoolean({ message: 'Este campo debe ser verdadero o falso.' })
   @ApiProperty({ example: true })
+  @Type(() => Boolean)
   isAvailable?: boolean;
 
   @IsOptional()
   @IsNumber({}, { message: 'El ID del item extra en la sede debe ser un número.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   extraBranchId?: number;
 
   @IsOptional()
   @IsNumber({}, { message: 'El ID del plato en la sede debe ser un número.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   branchDishId?: number;
 }

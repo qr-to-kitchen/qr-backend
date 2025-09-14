@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ExtraBranchDish } from './entities/extras-branch-dish.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Extra } from './entities/extras.entity';
@@ -41,10 +45,10 @@ export class ExtrasService {
       where: { id: createExtraDto.restaurantId }
     });
     if (!restaurant) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Restaurante no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -83,10 +87,10 @@ export class ExtrasService {
       where: { id: createExtraBranchDto.extraId }
     });
     if (!extra) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Extra no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -94,10 +98,10 @@ export class ExtrasService {
       where: { id: createExtraBranchDto.branchId }
     });
     if (!branch) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Sede no encontrada.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -116,10 +120,10 @@ export class ExtrasService {
       where: { id: createExtraBranchDishDto.extraBranchId }
     });
     if (!extraBranch) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Extra en sede no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -128,10 +132,10 @@ export class ExtrasService {
       relations: ['dish']
     });
     if (!branchDish) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Plato en sede no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -406,7 +410,7 @@ export class ExtrasService {
               total: bulkSaveExtraBranchDishes.extraBranchDishes.length
             });
           } else {
-            throw new NotFoundException({
+            throw new BadRequestException({
               message: ['Datos incorrectos.'],
               error: 'Bad Request',
               statusCode: 400

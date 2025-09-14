@@ -12,13 +12,13 @@ export class BulkSaveExtraBranches {
   @IsArray({ message: 'Los items deben ser una lista.' })
   @ArrayNotEmpty({ message: 'Los items no pueden estar vacíos.' })
   @ValidateNested({ each: true, message: 'Cada item debe ser válido.' })
-  @Type(() => CreateExtraBranchDto)
   @ApiProperty({
     example: [
       { id: 1, isAvailable: false },
       { isAvailable: true, customPrice: 10.4, extraBranchId: 4, branchDishId: 3 }
     ]
   })
+  @Type(() => CreateExtraBranchDto)
   extraBranches: CreateExtraBranchDto[];
 
   @IsNotEmpty({ message: 'El id del socket es obligatorio.'})
