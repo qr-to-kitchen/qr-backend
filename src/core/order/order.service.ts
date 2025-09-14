@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -41,10 +42,10 @@ export class OrderService {
       where: { id: createOrderDto.branchId }
     });
     if (!branch) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Sede no encontrada.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -54,10 +55,10 @@ export class OrderService {
         relations: ['dish']
       });
       if (!branchDish) {
-        throw new NotFoundException({
+        throw new BadRequestException({
           message: [`Plato con ID ${itemDto.branchDishId} no encontrado`],
           error: "Bad Request",
-          statusCode: 404
+          statusCode: 400
         });
       }
 
@@ -71,10 +72,10 @@ export class OrderService {
             relations: ['extraBranch.extra']
           });
           if (!extraBranchDish) {
-            throw new NotFoundException({
+            throw new BadRequestException({
               message: [`Extra en Plato en Sede con ID ${extraBranchDishId} no encontrado`],
               error: "Bad Request",
-              statusCode: 404
+              statusCode: 400
             });
           }
 
@@ -138,7 +139,7 @@ export class OrderService {
       if (!order) {
         throw new NotFoundException({
           message: ['Orden no encontrada'],
-          error: "Bad Request",
+          error: "Not Found",
           statusCode: 404
         });
       }
@@ -149,10 +150,10 @@ export class OrderService {
           relations: ['dish']
         });
         if (!branchDish) {
-          throw new NotFoundException({
+          throw new BadRequestException({
             message: [`Plato no encontrado`],
             error: "Bad Request",
-            statusCode: 404
+            statusCode: 400
           });
         }
 
@@ -166,10 +167,10 @@ export class OrderService {
               relations: ['extraBranch.extra']
             });
             if (!extraBranchDish) {
-              throw new NotFoundException({
+              throw new BadRequestException({
                 message: [`Extra en Plato en Sede no encontrado`],
                 error: "Bad Request",
-                statusCode: 404
+                statusCode: 400
               });
             }
 
@@ -358,10 +359,10 @@ export class OrderService {
       where: { id: restoreOrderDto.branchId }
     });
     if (!branch) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Error en la restauración (sede).'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -373,10 +374,10 @@ export class OrderService {
         relations: ['branch.restaurant', 'dish.category']
       });
       if (!branchDish) {
-        throw new NotFoundException({
+        throw new BadRequestException({
           message: [`Error en la restauración (plato)`],
           error: "Bad Request",
-          statusCode: 404
+          statusCode: 400
         });
       }
 
@@ -396,10 +397,10 @@ export class OrderService {
             relations: ['extraBranch.extra']
           });
           if (!extraBranchDish) {
-            throw new NotFoundException({
+            throw new BadRequestException({
               message: [`Error en la restauración (extra)`],
               error: "Bad Request",
-              statusCode: 404
+              statusCode: 400
             });
           }
 
@@ -425,10 +426,10 @@ export class OrderService {
       where: { id: retrieveOrderDto.branchId, dailyCode: retrieveOrderDto.dailyCode }
     });
     if (!branch) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Sede no encontrada.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -486,10 +487,10 @@ export class OrderService {
         relations: ['items']
       });
       if (!order) {
-        throw new NotFoundException({
+        throw new BadRequestException({
           message: ['Order no encontrada.'],
           error: "Bad Request",
-          statusCode: 404
+          statusCode: 400
         });
       }
 

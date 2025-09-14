@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderStatus } from './entity/order.entity';
@@ -23,7 +35,7 @@ export class OrderController {
 
   @Put('add-item/:id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  addItemToOrder(@Param('id', ParseIntPipe) id: number, @Body() addItemToOrderDto: AddItemToOrderDto) {
+  addItemToOrder(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() addItemToOrderDto: AddItemToOrderDto) {
     return this.orderService.addItemToOrder(id, addItemToOrderDto);
   }
 
@@ -34,33 +46,35 @@ export class OrderController {
   }
 
   @Get('branch/:id')
-  getOrderByBranchId(@Param('id', ParseIntPipe) id: number) {
+  getOrderByBranchId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.orderService.findByBranchId(id);
   }
 
   @Get('branch/active/:id')
-  getOrdersActiveByBranchId(@Param('id', ParseIntPipe) id: number) {
+  getOrdersActiveByBranchId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.orderService.findActiveByBranchId(id);
   }
 
   @Get('branch/:id/:page')
-  getOrderByBranchIdAndPage(@Param('id', ParseIntPipe) id: number, @Param('page', ParseIntPipe) page: number) {
+  getOrderByBranchIdAndPage(
+    @Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number,
+    @Param('page', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) page: number) {
     return this.orderService.findByBranchIdAndPage(id, page);
   }
 
   @Get('restaurant/:id')
-  getOrderByRestaurantId(@Param('id', ParseIntPipe) id: number) {
+  getOrderByRestaurantId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.orderService.findByRestaurantId(id);
   }
 
   @Get('branch/:id/status')
   @ApiQuery({ name: 'status', enum: OrderStatus, required: true })
-  getOrderByStatusAndBranchId(@Param('id', ParseIntPipe) id: number, @Query('status', new ValidationPipe({ transform: true })) status: OrderStatus) {
+  getOrderByStatusAndBranchId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Query('status', new ValidationPipe({ transform: true })) status: OrderStatus) {
     return this.orderService.findByStatusAndBranchId(status, id);
   }
 
   @Get(':id')
-  getOrderById(@Param('id', ParseIntPipe) id: number) {
+  getOrderById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.orderService.findById(id);
   }
 
@@ -78,13 +92,13 @@ export class OrderController {
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateStatusById(@Param('id', ParseIntPipe) id: number, @Body() updateOrderDto: UpdateOrderDto) {
+  updateStatusById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.updateStatusById(id, updateOrderDto.status);
   }
 
   @Put('items/:id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateItemsStatus(@Param('id', ParseIntPipe) id: number, @Body() updateOrderItemsDto: UpdateOrderItemsDto) {
+  updateItemsStatus(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() updateOrderItemsDto: UpdateOrderItemsDto) {
     return this.orderService.updateOrderItemsStatus(id, updateOrderItemsDto);
   }
 }

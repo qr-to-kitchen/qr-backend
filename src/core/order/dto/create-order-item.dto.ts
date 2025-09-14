@@ -8,11 +8,13 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { OrderStatusItem } from '../entity/order-item.entity';
+import { Type } from 'class-transformer';
 
 export class CreateOrderItemDto {
   @IsNumber({}, { message: 'La cantidad debe ser un número.' })
   @Min(1, { message: 'La cantidad debe ser mínimo uno.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   quantity: number;
 
   @IsOptional()
@@ -25,6 +27,7 @@ export class CreateOrderItemDto {
 
   @IsNumber({}, { message: 'El ID del plato en sede debe ser un número.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   branchDishId: number;
 
   @IsOptional()

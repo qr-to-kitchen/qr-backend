@@ -11,6 +11,7 @@ export class CreateOrderDto {
 
   @IsNumber({}, { message: 'El identificador de la mesa debe ser un número.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   tableNumber: number;
 
   @IsEnum(OrderStatus, { message: 'El estado enviado es incorrecto.' })
@@ -25,12 +26,12 @@ export class CreateOrderDto {
   @IsArray({ message: 'Los items deben ser una lista.' })
   @ArrayNotEmpty({ message: 'Los items no pueden estar vacíos.' })
   @ValidateNested({ each: true, message: 'Cada item debe ser válido.' })
-  @Type(() => CreateOrderItemDto)
   @ApiProperty({
     example: [
       { branchDishId: 1, quantity: 2, extraBranchDishIds: [1] },
       { branchDishId: 1, quantity: 1 }
     ]
   })
+  @Type(() => CreateOrderItemDto)
   items: CreateOrderItemDto[];
 }
