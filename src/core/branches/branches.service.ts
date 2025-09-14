@@ -29,10 +29,10 @@ export class BranchesService {
       where: { id: createBranchDto.userId }
     });
     if (!user) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Usuario no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -48,10 +48,10 @@ export class BranchesService {
       where: { id: createBranchDto.restaurantId }
     });
     if (!restaurant) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Restaurante no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -100,10 +100,10 @@ export class BranchesService {
         where: { id: createBranchUserDto.branch.restaurantId }
       });
       if (!restaurant) {
-        throw new NotFoundException({
+        throw new BadRequestException({
           message: ['Restaurante no encontrado.'],
           error: "Bad Request",
-          statusCode: 404
+          statusCode: 400
         });
       }
 

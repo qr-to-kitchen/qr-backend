@@ -1,10 +1,13 @@
 import {
+  BadRequestException,
   Body,
-  Controller, Delete,
+  Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
-  Post, Put,
+  Post,
+  Put,
   Request,
   UseGuards,
   UsePipes,
@@ -42,17 +45,17 @@ export class BranchesController {
   }
 
   @Get('user/:id')
-  getBranchByUserId(@Param('id', ParseIntPipe) id: number) {
+  getBranchByUserId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesService.findByUserId(id);
   }
 
   @Get('restaurant/:id')
-  getBranchByRestaurantId(@Param('id', ParseIntPipe) id: number) {
+  getBranchByRestaurantId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesService.findByRestaurantId(id);
   }
 
   @Get(':id')
-  getBranchById(@Param('id', ParseIntPipe) id: number) {
+  getBranchById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesService.findById(id);
   }
 
@@ -63,18 +66,18 @@ export class BranchesController {
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateById(@Param('id', ParseIntPipe) id: number, @Body() updateBranchDto: UpdateBranchDto) {
+  updateById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() updateBranchDto: UpdateBranchDto) {
     return this.branchesService.updateById(id, updateBranchDto);
   }
 
   @Put('dailyCode/:id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  refreshDailyCodeByBranchId(@Param('id', ParseIntPipe) id: number) {
+  refreshDailyCodeByBranchId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesService.refreshDailyCodeByBranchId(id);
   }
 
   @Delete(':id')
-  deleteById(@Param('id', ParseIntPipe) id: number) {
+  deleteById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesService.deleteById(id);
   }
 }

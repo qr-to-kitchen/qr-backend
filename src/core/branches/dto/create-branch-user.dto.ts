@@ -6,12 +6,12 @@ import { CreateBranchPlainDto } from './create-branch-plain.dto';
 
 export class CreateBranchUserDto {
   @ValidateNested({ each: true, message: 'El usuario debe ser válido.' })
-  @Type(() => RegisterUserDto)
   @ApiProperty({ type: () => RegisterUserDto })
+  @Type(() => RegisterUserDto)
   user: RegisterUserDto;
 
   @ValidateNested({ each: true, message: 'La sede debe ser válida.' })
-  @Type(() => CreateBranchPlainDto)
   @ApiProperty({ type: () => CreateBranchPlainDto })
+  @Type(() => CreateBranchPlainDto)
   branch: CreateBranchPlainDto;
 }
