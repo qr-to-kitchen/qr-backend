@@ -25,10 +25,10 @@ export class QrService {
       where: { id: createQrDto.branchId }
     });
     if (!branch) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Sede no encontrada.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -85,10 +85,10 @@ export class QrService {
       where: { id: createQrDto.branchId }
     });
     if (!branch) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Sede no encontrada.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -99,6 +99,7 @@ export class QrService {
       throw new NotFoundException({
         message: ['QR no encontrado.'],
         error: 'Not Found',
+        statusCode: 404
       })
     }
 

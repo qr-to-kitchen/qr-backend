@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -25,13 +26,13 @@ export class CategoriesController {
   }
 
   @Get('restaurant/:id')
-  getByRestaurantId(@Param('id', ParseIntPipe) id: number) {
+  getByRestaurantId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.categoriesService.findByRestaurantId(id);
   }
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateById(@Param('id', ParseIntPipe) id: number, @Body() updateCategoryDto: UpdateCategoryDto) {
+  updateById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoriesService.updateById(id, updateCategoryDto);
   }
 }

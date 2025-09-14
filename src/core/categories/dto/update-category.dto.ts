@@ -6,6 +6,7 @@ import {
   Min,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class UpdateCategoryDto {
   @IsOptional()
@@ -17,10 +18,12 @@ export class UpdateCategoryDto {
   @IsNumber({}, { message: 'El orden debe ser un número.' })
   @Min(1, { message: 'El orden debe ser mínimo uno.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   displayOrder?: number;
 
   @IsOptional()
   @IsBoolean({ message: 'Este campo debe ser verdadero o falso.' })
   @ApiProperty({ example: true })
+  @Type(() => Boolean)
   visible?: boolean;
 }

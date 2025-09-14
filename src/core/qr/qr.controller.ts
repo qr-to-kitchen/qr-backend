@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   UsePipes,
   ValidationPipe,
@@ -22,7 +24,7 @@ export class QrController {
   }
 
   @Get(':id')
-  getQrById(@Param('id') id: string) {
+  getQrById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: string) {
     return this.qrService.findById(id);
   }
 

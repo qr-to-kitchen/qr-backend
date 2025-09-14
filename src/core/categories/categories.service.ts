@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -24,10 +25,10 @@ export class CategoriesService {
       where: { id: createCategoryDto.restaurantId }
     });
     if (!restaurant) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Restaurante no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
