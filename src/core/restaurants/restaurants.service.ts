@@ -21,10 +21,10 @@ export class RestaurantsService {
       where: { id: createRestaurantDto.userId }
     });
     if (!user) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Usuario no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 

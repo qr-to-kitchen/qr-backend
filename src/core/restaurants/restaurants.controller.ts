@@ -1,10 +1,13 @@
 import {
+  BadRequestException,
   Body,
-  Controller, Delete,
+  Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
-  Post, Put,
+  Post,
+  Put,
   Request,
   UseGuards,
   UsePipes,
@@ -35,12 +38,12 @@ export class RestaurantsController {
   }
 
   @Get('user/:id')
-  getRestaurantByUserId(@Param('id', ParseIntPipe) id: number) {
+  getRestaurantByUserId(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.restaurantsService.findByUserId(id);
   }
 
   @Get(':id')
-  getRestaurantById(@Param('id', ParseIntPipe) id: number) {
+  getRestaurantById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.restaurantsService.findById(id);
   }
 
@@ -51,12 +54,12 @@ export class RestaurantsController {
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateById(@Param('id', ParseIntPipe) id: number, @Body() updateRestaurantDto: UpdateRestaurantDto) {
+  updateById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number, @Body() updateRestaurantDto: UpdateRestaurantDto) {
     return this.restaurantsService.updateById(id, updateRestaurantDto);
   }
 
   @Delete(':id')
-  deleteById(@Param('id', ParseIntPipe) id: number) {
+  deleteById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.restaurantsService.deleteById(id);
   }
 }
