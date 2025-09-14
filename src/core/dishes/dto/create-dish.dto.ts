@@ -1,6 +1,6 @@
 import { IsBoolean, IsNotEmpty, IsNumber, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateDishDto {
   @IsNotEmpty({ message: 'El nombre del plato es obligatorio.' })
@@ -11,25 +11,29 @@ export class CreateDishDto {
   @ApiProperty({ example: 'string' })
   description: string;
 
-  @Type(() => Number)
+  @IsNotEmpty({ message: 'El precio base es obligatorio.' })
   @IsNumber({}, { message: 'El precio base debe ser un número.' })
   @Min(0, { message: 'El precio base no puede ser negativo.' })
   @ApiProperty({ example: 10 })
+  @Type(() => Number)
   basePrice: number;
 
-  @Type(() => Number)
+  @IsNotEmpty({ message: 'El ID del restaurante es obligatorio.' })
   @IsNumber({}, { message: 'El ID del restaurante debe ser un número.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   restaurantId: number;
 
-  @Type(() => Number)
+  @IsNotEmpty({ message: 'El ID de la categoría es obligatorio.' })
   @IsNumber({}, { message: 'El ID de la categoría debe ser un número.' })
   @ApiProperty({ example: 1 })
+  @Type(() => Number)
   categoryId: number;
 
-  @Type(() => Boolean)
+  @IsNotEmpty({ message: 'Este campo es obligatorio.' })
   @IsBoolean({ message: 'Este campo debe ser verdadero o falso.' })
   @ApiProperty({ example: true })
+  @Transform(({ value }) => value === 'true')
   saveInAllBranches: boolean;
 
   @ApiProperty({ type: 'string', format: 'binary' })

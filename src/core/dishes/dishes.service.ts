@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Dish } from './dishes.entity';
 import { Restaurant } from '../restaurants/restaurants.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -29,10 +33,10 @@ export class DishesService {
       where: { id: createDishDto.restaurantId }
     });
     if (!restaurant) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Restaurante no encontrado.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -40,10 +44,10 @@ export class DishesService {
       where: { id: createDishDto.categoryId }
     });
     if (!category) {
-      throw new NotFoundException({
+      throw new BadRequestException({
         message: ['Categoría no encontrada.'],
         error: "Bad Request",
-        statusCode: 404
+        statusCode: 400
       });
     }
 
@@ -132,10 +136,10 @@ export class DishesService {
         where: { id: updateDishDto.categoryId }
       });
       if (!category) {
-        throw new NotFoundException({
+        throw new BadRequestException({
           message: ['Categoría no encontrada.'],
           error: "Bad Request",
-          statusCode: 404
+          statusCode: 400
         });
       }
 
