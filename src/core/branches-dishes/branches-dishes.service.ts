@@ -115,13 +115,6 @@ export class BranchesDishesService {
       where: { branch: { id: branchId } },
       relations: ['dish']
     });
-    if (!branchDishes.length) {
-      throw new NotFoundException({
-        message: ['Platos en sede no encontrados.'],
-        error: 'Not Found',
-        statusCode: 404
-      });
-    }
 
     const dishIdsInBranch = branchDishes.map(bd => bd.dish.id);
 

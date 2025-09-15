@@ -117,7 +117,8 @@ export class ExtrasService {
 
   async createExtraBranchDish(createExtraBranchDishDto: CreateExtraBranchDishDto) {
     const extraBranch = await this.extraBranchRepository.findOne({
-      where: { id: createExtraBranchDishDto.extraBranchId }
+      where: { id: createExtraBranchDishDto.extraBranchId },
+      relations: ['extra']
     });
     if (!extraBranch) {
       throw new BadRequestException({
@@ -219,13 +220,6 @@ export class ExtrasService {
       where: { branch: { id: branchId } },
       relations: ['extra']
     });
-    if (!extraBranches.length) {
-      throw new NotFoundException({
-        message: ['Extras en sede no encontrados.'],
-        error: 'Not Found',
-        statusCode: 404
-      });
-    }
 
     const extraIdsInBranch = extraBranches.map(eb => eb.extra.id);
 

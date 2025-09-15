@@ -1,10 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Restaurant } from './restaurants.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User, UserRole } from '../users/entity/users.entity';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import * as bcrypt from 'bcrypt';
+import { CreateRestaurantUserDto } from './dto/create-restaurant-user.dto';
 
 @Injectable()
 export class RestaurantsService {
@@ -13,7 +15,8 @@ export class RestaurantsService {
     @InjectRepository(Restaurant)
     private restaurantRepository: Repository<Restaurant>,
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
+    private dataSource: DataSource
   ) {}
 
   async create(createRestaurantDto: CreateRestaurantDto) {
@@ -44,6 +47,42 @@ export class RestaurantsService {
     const savedRestaurant = await this.restaurantRepository.save(newRestaurant);
 
     return { restaurant: savedRestaurant };
+  }
+
+  async createRestaurantWithUser(createRestaurantUserDto: CreateRestaurantUserDto) {
+    const restaurantId = await this.dataSource.transaction(async (manager) => {
+      const userRepo = manager.getRepository(User);
+      const restaurantRepo = manager.getRepository(Restaurant);
+
+      const userExisting = await userRepo.findOne({
+        where: [{ email: createRestaurantUserDto.user.email }, { username: createRestaurantUserDto.user.username }],
+      });
+      if (userExisting) {
+        throw new BadRequestException({
+          message: ['Email o username ya están en uso.'],
+          error: "Bad Request",
+          statusCode: 400
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(createRestaurantUserDto.user.password, 10);
+      const newUser = userRepo.create({
+        ...createRestaurantUserDto.user,
+        password: hashedPassword
+      });
+      const savedUser = await userRepo.save(newUser);
+
+      const restaurant = restaurantRepo.create({
+        name: createRestaurantUserDto.restaurant.name,
+        user: savedUser
+      });
+
+      const savedRestaurant = await restaurantRepo.save(restaurant);
+
+      return savedRestaurant.id;
+    });
+
+    return this.findById(restaurantId);
   }
 
   async findByUserId(userId: number) {

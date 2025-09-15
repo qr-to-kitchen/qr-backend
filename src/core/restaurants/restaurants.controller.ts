@@ -18,6 +18,7 @@ import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { CreateRestaurantUserDto } from './dto/create-restaurant-user.dto';
 
 @Controller('restaurants')
 export class RestaurantsController {
@@ -28,6 +29,12 @@ export class RestaurantsController {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   create(@Body() createRestaurantDto: CreateRestaurantDto) {
     return this.restaurantsService.create(createRestaurantDto);
+  }
+
+  @Post('restaurant-user')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  createRestaurantWithUser(@Body() createRestaurantUserDto: CreateRestaurantUserDto) {
+    return this.restaurantsService.createRestaurantWithUser(createRestaurantUserDto);
   }
 
   @Get('my')
