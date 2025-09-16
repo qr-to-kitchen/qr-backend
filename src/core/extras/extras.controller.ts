@@ -82,6 +82,30 @@ export class ExtrasController {
     return this.extrasService.findByBranchDishId(id);
   }
 
+  @Get('restaurant/:restaurantId/extra/:extraId')
+  getExtraBranchAvailabilityInBranches(
+    @Param('restaurantId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) restaurantId: number,
+    @Param('extraId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) extraId: number
+  ) {
+    return this.extrasService.getExtraBranchAvailabilityInBranches(restaurantId, extraId);
+  }
+
+  @Get('branch/:branchId/branchDish/:branchDishId')
+  getExtraBranchDishAvailabilityInExtraBranches(
+    @Param('branchId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) branchId: number,
+    @Param('branchDishId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) branchDishId: number
+  ) {
+    return this.extrasService.getExtraBranchDishAvailabilityInExtraBranches(branchId, branchDishId);
+  }
+
+  @Get('branch/:branchId/extraBranch/:extraBranchId')
+  getExtraBranchDishAvailabilityInBranchDishes(
+    @Param('branchId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) branchId: number,
+    @Param('extraBranchId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) extraBranchId: number
+  ) {
+    return this.extrasService.getExtraBranchDishAvailabilityInBranchDishes(branchId, extraBranchId);
+  }
+
   @Post('bulk-save')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   bulkSave(@Body() bulkSaveExtraBranchDishes: BulkSaveExtraBranchDishes) {

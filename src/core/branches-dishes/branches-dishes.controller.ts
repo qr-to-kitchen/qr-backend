@@ -61,6 +61,14 @@ export class BranchesDishesController {
     return this.branchesDishesService.findByBranchIdAndDishId(branchId, dishId);
   }
 
+  @Get('restaurant/:restaurantId/dish/:dishId')
+  getBranchDishAvailabilityInBranches(
+    @Param('restaurantId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) restaurantId: number,
+    @Param('dishId', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) dishId: number
+  ) {
+    return this.branchesDishesService.getBranchDishAvailabilityInBranches(restaurantId, dishId);
+  }
+
   @Get(':id')
   getBranchDishById(@Param('id', new ParseIntPipe({ exceptionFactory: () => new BadRequestException("El parametro debe ser un número") })) id: number) {
     return this.branchesDishesService.findById(id);

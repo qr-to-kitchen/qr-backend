@@ -278,6 +278,95 @@ export class ExtrasService {
     return { extraBranchDishes };
   }
 
+  async getExtraBranchAvailabilityInBranches(restaurantId: number, extraId: number) {
+    const branches = await this.branchRepository.find({
+      where: { restaurant: { id: restaurantId } }
+    });
+    const extra = await this.extraRepository.findOne({
+      where: { id: extraId }
+    });
+
+    const extraBranches: ExtraBranch[] = [];
+
+    for (const branch of branches) {
+      const extraBranch = await this.extraBranchRepository.findOne({
+        where: { branch: { id: branch.id }, extra: { id: extraId } },
+        relations: ['extra', 'branch']
+      });
+      if (extraBranch) {
+        extraBranches.push(extraBranch);
+      } else {
+        const extraBranch = {
+          branch: branch,
+          extra: extra
+        } as ExtraBranch;
+        extraBranches.push(extraBranch);
+      }
+    }
+
+    return { extraBranches };
+  }
+
+  async getExtraBranchDishAvailabilityInExtraBranches(branchId: number, branchDishId: number) {
+    const extraBranches = await this.extraBranchRepository.find({
+      where: { branch: { id: branchId } },
+      relations: ['extra']
+    });
+    const branchDish = await this.branchDishRepository.findOne({
+      where: { id: branchDishId }
+    });
+
+    const extraBranchDishes: ExtraBranchDish[] = [];
+
+    for (const extraBranch of extraBranches) {
+      const extraBranchDish = await this.extraBranchDishRepository.findOne({
+        where: { extraBranch: { id: extraBranch.id }, branchDish: { id: branchDishId } },
+        relations: ['extraBranch.extra', 'branchDish']
+      });
+      if (extraBranchDish) {
+        extraBranchDishes.push(extraBranchDish);
+      } else {
+        const extraBranchDish = {
+          extraBranch: extraBranch,
+          branchDish: branchDish
+        } as ExtraBranchDish;
+        extraBranchDishes.push(extraBranchDish);
+      }
+    }
+
+    return { extraBranchDishes };
+  }
+
+  async getExtraBranchDishAvailabilityInBranchDishes(branchId: number, extraBranchId: number) {
+    const branchDishes = await this.branchDishRepository.find({
+      where: { branch: { id: branchId } },
+      relations: ['dish']
+    });
+    const extraBranch = await this.extraBranchRepository.findOne({
+      where: { id: extraBranchId }
+    });
+
+    const extraBranchDishes: ExtraBranchDish[] = [];
+
+    for (const branchDish of branchDishes) {
+      const extraBranchDish = await this.extraBranchDishRepository.findOne({
+        where: { branchDish: { id: branchDish.id }, extraBranch: { id: extraBranchId } },
+        relations: ['extraBranch.extra', 'extraBranch.branch', 'branchDish.dish']
+      });
+      if (extraBranchDish) {
+        extraBranchDishes.push(extraBranchDish);
+      } else {
+        const extraBranchDish = {
+          extraBranch: extraBranch,
+          branchDish: branchDish
+        } as ExtraBranchDish;
+        extraBranchDishes.push(extraBranchDish);
+      }
+    }
+
+    return { extraBranchDishes };
+  }
+
   async updateExtraById(id: number, updateExtraDto: UpdateExtraDto) {
     const extra = await this.extraRepository.findOneBy({
       id

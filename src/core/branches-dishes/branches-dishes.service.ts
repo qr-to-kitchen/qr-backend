@@ -141,6 +141,35 @@ export class BranchesDishesService {
     return { branchDish };
   }
 
+  async getBranchDishAvailabilityInBranches(restaurantId: number, dishId: number) {
+    const branches = await this.branchRepository.find({
+      where: { restaurant: { id: restaurantId } }
+    });
+    const dish = await this.dishRepository.findOne({
+      where: { id: dishId }
+    });
+
+    const branchesDishes: BranchDish[] = [];
+
+    for (const branch of branches) {
+      const branchDish = await this.branchDishRepository.findOne({
+        where: { branch: { id: branch.id }, dish: { id: dishId } },
+        relations: ['dish', 'branch']
+      });
+      if (branchDish) {
+        branchesDishes.push(branchDish);
+      } else {
+        const branchDish = {
+          branch: branch,
+          dish: dish
+        } as BranchDish;
+        branchesDishes.push(branchDish);
+      }
+    }
+
+    return { branchesDishes };
+  }
+
   async findById(id: number) {
     const branchDish = await this.branchDishRepository.findOne({
       where: { id },
