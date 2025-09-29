@@ -24,11 +24,10 @@ async function bootstrap() {
   if (process.env.NODE_ENV === 'production') {
     builder
       .addServer('qr', 'Prod-dominio')
-      .addServer('/', 'Dev Prod-ip');
+      .addServer('/', 'Prod-ip');
   } else {
     builder
-      .addServer('/', 'Dev Prod-ip')
-      .addServer('qr', 'Prod-dominio');
+      .addServer('/', 'Dev');
   }
 
   const document = SwaggerModule.createDocument(app, builder.build());
