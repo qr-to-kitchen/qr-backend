@@ -21,14 +21,14 @@ async function bootstrap() {
       'jwt-auth'
     );
 
-  if (process.env.NODE_ENV === 'production') {
+  /*if (process.env.NODE_ENV === 'production') {
     builder
       .addServer('https://www.aurumtech.site/qr', 'Prod-dominio')
       .addServer('/', 'Prod-ip');
   } else {
     builder
       .addServer('/', 'Dev');
-  }
+  }*/
 
   const document = SwaggerModule.createDocument(app, builder.build());
   SwaggerModule.setup('api', app, document);
