@@ -9,7 +9,7 @@ export class AppController {
   @Get('version')
   getVersion() {
     return {
-      version: '2.7.1'
+      version: '2.7.2'
     };
   }
 }

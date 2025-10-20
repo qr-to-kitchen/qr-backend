@@ -23,7 +23,7 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV === 'production') {
     builder
-      .addServer('qr', 'Prod-dominio')
+      .addServer('https://www.aurumtech.site/qr', 'Prod-dominio')
       .addServer('/', 'Prod-ip');
   } else {
     builder
