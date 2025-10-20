@@ -30,6 +30,11 @@ export class ConfigurationController {
     return this.configurationService.findByRestaurantId(id);
   }
 
+  @Get('branch/:id')
+  getConfigurationByBranchId(@Param('id', ParseIntPipe) id: number) {
+    return this.configurationService.findByBranchId(id);
+  }
+
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   updateById(@Param('id', ParseIntPipe) id: number, @Body() updateConfigurationDto: UpdateConfigurationDto) {

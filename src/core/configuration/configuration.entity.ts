@@ -19,7 +19,7 @@ export class Configuration {
   primaryColor: string;
 
   @Column()
-  primaryFont: string;
+  backgroundImage: string;
 
   @CreateDateColumn()
   createdAt: Date;

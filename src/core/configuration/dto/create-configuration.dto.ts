@@ -6,9 +6,9 @@ export class CreateConfigurationDto {
   @ApiProperty({ example: '#000000' })
   primaryColor: string;
 
-  @IsNotEmpty({ message: 'El nombre de la fuente principal es obligatorio.'})
+  @IsNotEmpty({ message: 'La imagen de fondo es obligatoria.'})
   @ApiProperty({ example: 'string' })
-  primaryFont: string;
+  backgroundImage: string;
 
   @IsNumber({}, { message: 'El ID del usuario debe ser un número.' })
   @ApiProperty({ example: 1 })

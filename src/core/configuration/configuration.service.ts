@@ -30,7 +30,7 @@ export class ConfigurationService {
     
     const newConfiguration = this.configurationRepository.create({
       primaryColor: createConfigurationDto.primaryColor,
-      primaryFont: createConfigurationDto.primaryFont,
+      backgroundImage: createConfigurationDto.backgroundImage,
       restaurant: restaurant
     });
 
@@ -42,6 +42,21 @@ export class ConfigurationService {
   async findByRestaurantId(restaurantId: number) {
     const configuration = await this.configurationRepository.findOne({
       where: { restaurant: { id: restaurantId } }
+    });
+    if (!configuration) {
+      throw new NotFoundException({
+        message: ['Configuración no encontrada.'],
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+
+    return { configuration };
+  }
+
+  async findByBranchId(branchId: number) {
+    const configuration = await this.configurationRepository.findOne({
+      where: { restaurant: { branches: { id: branchId } } }
     });
     if (!configuration) {
       throw new NotFoundException({
