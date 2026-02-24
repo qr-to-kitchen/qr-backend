@@ -24,7 +24,7 @@ async function bootstrap() {
   if (process.env.NODE_ENV === 'production') {
     builder
       .addServer('https://www.aurumtech.site/qr', 'Prod-dominio')
-      .addServer('/', 'Prod-ip');
+      .addServer('http://13.222.77.187:3001/', 'Prod-ip');
   } else {
     builder
       .addServer('/', 'Dev');
